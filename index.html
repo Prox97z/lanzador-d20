@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lanzador de d20 Universal Pro - Optimizado</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151c2c;
+            --accent-color: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --border-color: #2a354d;
+            --text-main: #ffffff;
+            --text-muted: #a3adc2;
+            --input-bg: #0b0f19;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --result-bg: #090d16;
+            --card-radius: 16px;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body.theme-style2 {
+            --bg-color: #05050a;
+            --card-bg: #0e121e;
+            --accent-color: #06b6d4;
+            --accent-hover: #0891b2;
+            --border-color: #1e293b;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --input-bg: #05050a;
+            --success-color: #22c55e;
+            --danger-color: #f43f5e;
+            --result-bg: #05050a;
+            --card-radius: 12px;
+        }
+
+        /* TEMA ROJO TINTO / SANGRE */
+        body.theme-style3 {
+            --bg-color: #0a0203;
+            --card-bg: #1a080a;
+            --accent-color: #991b1b;
+            --accent-hover: #b91c1c;
+            --border-color: #450a0a;
+            --text-main: #ffffff;
+            --text-muted: #fca5a5;
+            --input-bg: #0a0203;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --result-bg: #050102;
+            --card-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+        }
+
+        /* FONDO LIGERO SIN ANIMACIONES PESADAS NI LAG */
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-color) 70%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+            position: relative;
+        }
+
+        body.theme-style3 {
+            background-image: radial-gradient(circle at 50% 0%, #450a0a 0%, var(--bg-color) 70%);
+        }
+
+        /* TARJETA SÓLIDA DE ALTO CONTRASTE */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 24px;
+            width: 100%;
+            max-width: 440px;
+            height: 620px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            background: var(--input-bg);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .mod-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .btn-small {
+            padding: 6px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .btn-small:hover {
+            border-color: var(--accent-color);
+        }
+
+        .roll-options {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-roll {
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-roll:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-alt {
+            padding: 10px;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-alt:hover {
+            border-color: var(--accent-color);
+        }
+
+        /* CAJA DE RESULTADO SÓLIDA DE ALTA VISIBILIDAD */
+        .result-box {
+            height: 105px;
+            padding: 10px;
+            background-color: var(--result-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .result-box.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .die-result-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+        }
+
+        .die-result {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--success-color);
+            line-height: 1;
+        }
+
+        .crit-20 {
+            color: var(--success-color);
+        }
+
+        .crit-1 {
+            color: var(--danger-color);
+        }
+
+        .details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn-history-toggle {
+            padding: 5px 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .history-panel {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            margin-left: 12px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 16px;
+            width: 260px;
+            height: 100%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .history-panel.active {
+            display: flex;
+        }
+
+        .history-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-list {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+        }
+
+        .history-item {
+            font-size: 0.75rem;
+            color: var(--text-main);
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .preset-editor-list {
+            max-height: 220px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            padding-right: 4px;
+        }
+
+        .preset-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+
+        .preset-row input[type="text"] { flex: 2; }
+        .preset-row input[type="number"] { flex: 1; }
+
+        .btn-danger {
+            background-color: #7f1d1d;
+            color: #fca5a5;
+            border: 1px solid #991b1b;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .btn-secondary {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-success {
+            background-color: #059669;
+            color: #ffffff;
+        }
+
+        .setting-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 8px 10px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .theme-btn {
+            flex: 1;
+            padding: 8px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .theme-btn.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        /* FIRMA ABAJO A LA DERECHA */
+        .credits-footer {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @media (max-width: 768px) {
+            .history-panel {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                margin-left: 0;
+                width: 90%;
+                max-width: 320px;
+                height: 80vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div>
+        <div class="header">
+            <h1>Lanzador d20 Pro</h1>
+            <div class="subtitle">Herramienta Universal Personalizable</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('rollTab')">🎲 Lanzar Dado</button>
+            <button class="tab-btn" onclick="switchTab('configTab')">⚙️ Configuración</button>
+        </div>
+    </div>
+
+    <div id="rollTab" class="tab-content active">
+        <div>
+            <div class="form-group">
+                <label for="presetSelect">Seleccionar Preset:</label>
+                <select id="presetSelect" onchange="applySelectedPreset()"></select>
+            </div>
+
+            <div class="form-group">
+                <label for="action">Acción / Habilidad:</label>
+                <input type="text" id="action" placeholder="Ej. Ataque, Sigilo, Atletismo...">
+            </div>
+
+            <div class="form-group">
+                <label for="modifier">Modificador (+ o -):</label>
+                <input type="number" id="modifier" value="0">
+                <div class="mod-controls">
+                    <button class="btn-small" onclick="addMod(-5)">-5</button>
+                    <button class="btn-small" onclick="addMod(-1)">-1</button>
+                    <button class="btn-small" onclick="addMod(1)">+1</button>
+                    <button class="btn-small" onclick="addMod(5)">+5</button>
+                </div>
+            </div>
+
+            <div class="roll-options">
+                <button class="btn-alt" onclick="rollD20('dis')">Desventaja</button>
+                <button class="btn-roll" onclick="rollD20('normal')">Lanzar d20</button>
+                <button class="btn-alt" onclick="rollD20('adv')">Ventaja</button>
+            </div>
+
+            <div class="result-box" id="resultBox">
+                <div class="details" id="actionName"></div>
+                <div class="die-result-container">
+                    <div class="die-result" id="finalTotal">0</div>
+                </div>
+                <div class="details" id="breakdown"></div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <span>Tiradas: <strong id="totalRollsCount">0</strong> | Promedio: <strong id="avgRoll">0</strong></span>
+            <button class="btn-history-toggle" onclick="toggleHistory()">📜 Historial</button>
+        </div>
+    </div>
+
+    <div id="configTab" class="tab-content">
+        <div>
+            <label>Estilo Visual:</label>
+            <div class="theme-selector">
+                <button class="theme-btn active" id="themeBtn1" onclick="setTheme(1)">Violeta</button>
+                <button class="theme-btn" id="themeBtn2" onclick="setTheme(2)">Neón</button>
+                <button class="theme-btn" id="themeBtn3" onclick="setTheme(3)">Rojo Tinto</button>
+            </div>
+
+            <div class="setting-toggle">
+                <span>Efecto de sonido al lanzar</span>
+                <input type="checkbox" id="soundToggle" checked style="width: auto;">
+            </div>
+
+            <label>Editor de Presets:</label>
+            <div class="preset-editor-list" id="presetEditorList"></div>
+        </div>
+
+        <div>
+            <button class="btn-action btn-secondary" onclick="addPresetRow()">+ Añadir Preset</button>
+            <button class="btn-action btn-success" onclick="savePresetsFromEditor()">💾 Guardar Presets</button>
+            <button class="btn-action btn-secondary" style="color: #f87171;" onclick="clearHistory()">🗑️ Limpiar Historial</button>
+        </div>
+    </div>
+
+    <div class="history-panel" id="historyPanel">
+        <div class="history-title">
+            <span>📜 Historial</span>
+            <button class="btn-small" style="padding: 2px 6px;" onclick="toggleHistory()">✕</button>
+        </div>
+        <div class="history-list" id="historyList"></div>
+    </div>
+</div>
+
+<!-- FIRMA SOLICITADA -->
+<div class="credits-footer">creado por prox</div>
+
+<script>
+    const defaultPresets = [
+        { name: "Ataque Principal", mod: 5 },
+        { name: "Ataque Mágico / Conjuro", mod: 5 },
+        { name: "Iniciativa", mod: 2 },
+        { name: "Percepción (SAB)", mod: 1 },
+        { name: "Sigilo (DES)", mod: 3 },
+        { name: "Atletismo (FUE)", mod: 0 },
+        { name: "Investigación (INT)", mod: 5 },
+        { name: "Persuasión (CAR)", mod: 0 },
+        { name: "Salvación Fuerza", mod: 0 },
+        { name: "Salvación Destreza", mod: 3 },
+        { name: "Salvación Constitución", mod: 0 },
+        { name: "Salvación Inteligencia", mod: 5 },
+        { name: "Salvación Sabiduría", mod: 3 },
+        { name: "Salvación Carisma", mod: 0 }
+    ];
+
+    let userPresets = [];
+    let totalRolls = 0;
+    let sumRawRolls = 0;
+
+    function setTheme(styleNum) {
+        document.body.classList.remove('theme-style2', 'theme-style3');
+        document.getElementById('themeBtn1').classList.remove('active');
+        document.getElementById('themeBtn2').classList.remove('active');
+        document.getElementById('themeBtn3').classList.remove('active');
+
+        if (styleNum === 2) {
+            document.body.classList.add('theme-style2');
+            document.getElementById('themeBtn2').classList.add('active');
+        } else if (styleNum === 3) {
+            document.body.classList.add('theme-style3');
+            document.getElementById('themeBtn3').classList.add('active');
+        } else {
+            document.getElementById('themeBtn1').classList.add('active');
+        }
+    }
+
+    function playDiceSound() {
+        if (!document.getElementById('soundToggle').checked) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(120, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.1);
+        } catch(e) {}
+    }
+
+    function init() {
+        const saved = localStorage.getItem('d20_pro_presets_v2');
+        if (saved) {
+            try { userPresets = JSON.parse(saved); } catch(e) { userPresets = [...defaultPresets]; }
+        } else {
+            userPresets = [...defaultPresets];
+        }
+        renderPresetDropdown();
+        renderPresetEditor();
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        if (tabId === 'rollTab') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('rollTab').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('configTab').classList.add('active');
+        }
+    }
+
+    function toggleHistory() {
+        const panel = document.getElementById('historyPanel');
+        panel.classList.toggle('active');
+    }
+
+    function renderPresetDropdown() {
+        const select = document.getElementById('presetSelect');
+        select.innerHTML = '<option value="custom|0">-- Tirada Manual / Personalizada --</option>';
+
+        userPresets.forEach((p) => {
+            const opt = document.createElement('option');
+            const modSign = p.mod >= 0 ? `+${p.mod}` : `${p.mod}`;
+            opt.value = `${p.name}|${p.mod}`;
+            opt.textContent = `${p.name} (${modSign})`;
+            select.appendChild(opt);
+        });
+    }
+
+    function renderPresetEditor() {
+        const container = document.getElementById('presetEditorList');
+        container.innerHTML = '';
+
+        userPresets.forEach((p, index) => {
+            const row = document.createElement('div');
+            row.className = 'preset-row';
+            row.innerHTML = `
+                <input type="text" class="edit-name" value="${p.name}" placeholder="Nombre">
+                <input type="number" class="edit-mod" value="${p.mod}" placeholder="Mod">
+                <button class="btn-danger" onclick="removePresetRow(${index})">✕</button>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function applySelectedPreset() {
+        const val = document.getElementById('presetSelect').value;
+        if (val.includes('|')) {
+            const [name, mod] = val.split('|');
+            if (name !== 'custom') {
+                document.getElementById('action').value = name;
+                document.getElementById('modifier').value = parseInt(mod);
+            }
+        }
+    }
+
+    function addPresetRow() {
+        userPresets.push({ name: "Nueva Habilidad", mod: 0 });
+        renderPresetEditor();
+    }
+
+    function removePresetRow(index) {
+        userPresets.splice(index, 1);
+        renderPresetEditor();
+    }
+
+    function savePresetsFromEditor() {
+        const rows = document.querySelectorAll('.preset-row');
+        const updated = [];
+        rows.forEach(row => {
+            const name = row.querySelector('.edit-name').value.trim();
+            const mod = parseInt(row.querySelector('.edit-mod').value) || 0;
+            if (name) updated.push({ name, mod });
+        });
+        userPresets = updated;
+        localStorage.setItem('d20_pro_presets_v2', JSON.stringify(userPresets));
+        renderPresetDropdown();
+        alert('¡Presets guardados exitosamente!');
+        switchTab('rollTab');
+    }
+
+    function clearHistory() {
+        document.getElementById('historyList').innerHTML = '';
+        totalRolls = 0;
+        sumRawRolls = 0;
+        document.getElementById('totalRollsCount').textContent = '0';
+        document.getElementById('avgRoll').textContent = '0';
+        alert('Historial borrado.');
+    }
+
+    function addMod(val) {
+        const input = document.getElementById('modifier');
+        input.value = (parseInt(input.value) || 0) + val;
+    }
+
+    function rollD20(mode) {
+        playDiceSound();
+        const actionInput = document.getElementById('action').value.trim();
+        const modInput = parseInt(document.getElementById('modifier').value) || 0;
+        
+        let roll1 = Math.floor(Math.random() * 20) + 1;
+        let roll2 = Math.floor(Math.random() * 20) + 1;
+        let selectedRoll = roll1;
+        let modeText = '';
+
+        if (mode === 'adv') {
+            selectedRoll = Math.max(roll1, roll2);
+            modeText = ` [Ventaja: ${roll1}, ${roll2}]`;
+        } else if (mode === 'dis') {
+            selectedRoll = Math.min(roll1, roll2);
+            modeText = ` [Desventaja: ${roll1}, ${roll2}]`;
+        }
+
+        const total = selectedRoll + modInput;
+
+        totalRolls++;
+        sumRawRolls += selectedRoll;
+        document.getElementById('totalRollsCount').textContent = totalRolls;
+        document.getElementById('avgRoll').textContent = (sumRawRolls / totalRolls).toFixed(1);
+
+        const resultBox = document.getElementById('resultBox');
+        const actionNameEl = document.getElementById('actionName');
+        const finalTotalEl = document.getElementById('finalTotal');
+        const breakdownEl = document.getElementById('breakdown');
+        const historyList = document.getElementById('historyList');
+
+        actionNameEl.textContent = actionInput ? `Acción: ${actionInput}` : 'Tirada Libre';
+        finalTotalEl.textContent = total;
+
+        finalTotalEl.className = 'die-result';
+        let critTag = '';
+        if (selectedRoll === 20) {
+            finalTotalEl.classList.add('crit-20');
+            critTag = ' ★ ¡CRÍTICO!';
+        } else if (selectedRoll === 1) {
+            finalTotalEl.classList.add('crit-1');
+            critTag = ' ✖ ¡FALLO CRÍTICO!';
+        }
+
+        const modSign = modInput >= 0 ? `+ ${modInput}` : `- ${Math.abs(modInput)}`;
+        breakdownEl.textContent = `Dado: ${selectedRoll} (${modSign})${modeText}${critTag}`;
+
+        resultBox.classList.add('visible');
+
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        const nameText = actionInput ? `${actionInput}: ` : '';
+        historyItem.textContent = `${nameText}Total ${total} (Dado ${selectedRoll} ${modSign})${modeText}`;
+        historyList.prepend(historyItem);
+    }
+
+    init();
+</script>
+
+</body>
+</html>
