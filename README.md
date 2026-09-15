@@ -23,7 +23,7 @@ Este es un proyecto personal creado por **Prox** por gusto y diversión para fac
 
 ---
 
-## 🇬🇧 English
+## 🇺🇸 EN - English
 
 ### 📌 About this project
 This is a personal project created by **Prox** just for fun, designed to streamline dice rolling during tabletop RPG sessions.
