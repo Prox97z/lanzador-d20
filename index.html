@@ -36,7 +36,6 @@
             --card-radius: 12px;
         }
 
-        /* TEMA ROJO TINTO / SANGRE */
         body.theme-style3 {
             --bg-color: #0a0203;
             --card-bg: #1a080a;
@@ -59,7 +58,6 @@
             font-family: var(--font-family);
         }
 
-        /* FONDO LIGERO SIN ANIMACIONES PESADAS NI LAG */
         body {
             background-color: var(--bg-color);
             background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-color) 70%);
@@ -76,7 +74,6 @@
             background-image: radial-gradient(circle at 50% 0%, #450a0a 0%, var(--bg-color) 70%);
         }
 
-        /* TARJETA SÓLIDA DE ALTO CONTRASTE */
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -180,8 +177,8 @@
 
         .mod-controls {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
             margin-top: 6px;
         }
 
@@ -193,7 +190,7 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .btn-small:hover {
@@ -237,7 +234,6 @@
             border-color: var(--accent-color);
         }
 
-        /* CAJA DE RESULTADO SÓLIDA DE ALTA VISIBILIDAD */
         .result-box {
             height: 105px;
             padding: 10px;
@@ -272,13 +268,8 @@
             line-height: 1;
         }
 
-        .crit-20 {
-            color: var(--success-color);
-        }
-
-        .crit-1 {
-            color: var(--danger-color);
-        }
+        .crit-20 { color: var(--success-color); }
+        .crit-1 { color: var(--danger-color); }
 
         .details {
             font-size: 0.8rem;
@@ -324,9 +315,7 @@
             z-index: 10;
         }
 
-        .history-panel.active {
-            display: flex;
-        }
+        .history-panel.active { display: flex; }
 
         .history-title {
             font-size: 0.85rem;
@@ -354,9 +343,9 @@
         }
 
         .preset-editor-list {
-            max-height: 220px;
+            max-height: 180px;
             overflow-y: auto;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             padding-right: 4px;
         }
 
@@ -382,13 +371,13 @@
 
         .btn-action {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .btn-secondary {
@@ -406,7 +395,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             padding: 8px 10px;
             background: var(--input-bg);
             border: 1px solid var(--border-color);
@@ -417,7 +406,7 @@
         .theme-selector {
             display: flex;
             gap: 6px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .theme-btn {
@@ -437,7 +426,6 @@
             color: var(--accent-color);
         }
 
-        /* FIRMA ABAJO A LA DERECHA */
         .credits-footer {
             position: fixed;
             bottom: 12px;
@@ -498,6 +486,7 @@
                 <div class="mod-controls">
                     <button class="btn-small" onclick="addMod(-5)">-5</button>
                     <button class="btn-small" onclick="addMod(-1)">-1</button>
+                    <button class="btn-small" style="color: var(--accent-color);" onclick="resetMod()">0</button>
                     <button class="btn-small" onclick="addMod(1)">+1</button>
                     <button class="btn-small" onclick="addMod(5)">+5</button>
                 </div>
@@ -545,6 +534,7 @@
         <div>
             <button class="btn-action btn-secondary" onclick="addPresetRow()">+ Añadir Preset</button>
             <button class="btn-action btn-success" onclick="savePresetsFromEditor()">💾 Guardar Presets</button>
+            <button class="btn-action btn-secondary" onclick="resetDefaultPresets()">🔄 Restablecer Presets a 0</button>
             <button class="btn-action btn-secondary" style="color: #f87171;" onclick="clearHistory()">🗑️ Limpiar Historial</button>
         </div>
     </div>
@@ -558,24 +548,24 @@
     </div>
 </div>
 
-<!-- FIRMA SOLICITADA -->
 <div class="credits-footer">creado por prox</div>
 
 <script>
+    // PRESETS POR DEFECTO AHORA TODOS EN 0
     const defaultPresets = [
-        { name: "Ataque Principal", mod: 5 },
-        { name: "Ataque Mágico / Conjuro", mod: 5 },
-        { name: "Iniciativa", mod: 2 },
-        { name: "Percepción (SAB)", mod: 1 },
-        { name: "Sigilo (DES)", mod: 3 },
+        { name: "Ataque Principal", mod: 0 },
+        { name: "Ataque Mágico / Conjuro", mod: 0 },
+        { name: "Iniciativa", mod: 0 },
+        { name: "Percepción (SAB)", mod: 0 },
+        { name: "Sigilo (DES)", mod: 0 },
         { name: "Atletismo (FUE)", mod: 0 },
-        { name: "Investigación (INT)", mod: 5 },
+        { name: "Investigación (INT)", mod: 0 },
         { name: "Persuasión (CAR)", mod: 0 },
         { name: "Salvación Fuerza", mod: 0 },
-        { name: "Salvación Destreza", mod: 3 },
+        { name: "Salvación Destreza", mod: 0 },
         { name: "Salvación Constitución", mod: 0 },
-        { name: "Salvación Inteligencia", mod: 5 },
-        { name: "Salvación Sabiduría", mod: 3 },
+        { name: "Salvación Inteligencia", mod: 0 },
+        { name: "Salvación Sabiduría", mod: 0 },
         { name: "Salvación Carisma", mod: 0 }
     ];
 
@@ -619,7 +609,7 @@
     }
 
     function init() {
-        const saved = localStorage.getItem('d20_pro_presets_v2');
+        const saved = localStorage.getItem('d20_pro_presets_v3');
         if (saved) {
             try { userPresets = JSON.parse(saved); } catch(e) { userPresets = [...defaultPresets]; }
         } else {
@@ -706,10 +696,20 @@
             if (name) updated.push({ name, mod });
         });
         userPresets = updated;
-        localStorage.setItem('d20_pro_presets_v2', JSON.stringify(userPresets));
+        localStorage.setItem('d20_pro_presets_v3', JSON.stringify(userPresets));
         renderPresetDropdown();
         alert('¡Presets guardados exitosamente!');
         switchTab('rollTab');
+    }
+
+    function resetDefaultPresets() {
+        if (confirm('¿Quieres restablecer todos los presets a los nombres por defecto con modificador 0?')) {
+            userPresets = JSON.parse(JSON.stringify(defaultPresets));
+            localStorage.setItem('d20_pro_presets_v3', JSON.stringify(userPresets));
+            renderPresetDropdown();
+            renderPresetEditor();
+            alert('Presets restablecidos a 0.');
+        }
     }
 
     function clearHistory() {
@@ -724,6 +724,10 @@
     function addMod(val) {
         const input = document.getElementById('modifier');
         input.value = (parseInt(input.value) || 0) + val;
+    }
+
+    function resetMod() {
+        document.getElementById('modifier').value = 0;
     }
 
     function rollD20(mode) {
