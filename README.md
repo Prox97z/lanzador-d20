@@ -25,7 +25,7 @@ Esta versión ha sido **altamente optimizada para un rendimiento fluido** inclus
 ---
 
 <a name="english"></a>
-## 🇬🇧 English
+## us EN - English
 
 An advanced, smooth, and fully customizable web tool designed for rolling 20-sided dice (d20) in tabletop role-playing games (TTRPGs) such as Dungeons & Dragons, Pathfinder, and similar systems.
 
