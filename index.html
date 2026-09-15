@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lanzador de d20 Universal Pro - Optimizado</title>
+    <title>Lanzador de d20 Universal Pro - Animado Optimizado</title>
     <style>
         :root {
             --bg-color: #0b0f19;
@@ -68,6 +68,7 @@
             min-height: 100vh;
             padding: 16px;
             position: relative;
+            overflow-x: hidden;
         }
 
         body.theme-style3 {
@@ -81,7 +82,7 @@
             padding: 24px;
             width: 100%;
             max-width: 440px;
-            height: 620px;
+            height: 640px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -234,8 +235,9 @@
             border-color: var(--accent-color);
         }
 
+        /* --- RESULT BOX & SMALL INTEGRATED DICE --- */
         .result-box {
-            height: 105px;
+            height: 115px;
             padding: 10px;
             background-color: var(--result-bg);
             border-radius: 12px;
@@ -246,7 +248,11 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
             margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
 
         .result-box.visible {
@@ -254,22 +260,63 @@
             visibility: visible;
         }
 
-        .die-result-container {
+        .dice-stage {
+            width: 60px;
+            height: 60px;
+            perspective: 600px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 48px;
         }
 
-        .die-result {
-            font-size: 2.6rem;
+        .d20-icon {
+            width: 50px;
+            height: 50px;
+            position: relative;
+            transform-style: preserve-3d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            will-change: transform, opacity;
+        }
+
+        .d20-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--card-bg);
+            stroke: var(--accent-color);
+            stroke-width: 2;
+        }
+
+        .d20-number {
+            position: absolute;
+            font-size: 1.4rem;
             font-weight: 800;
-            color: var(--success-color);
-            line-height: 1;
+            color: #ffffff;
+            pointer-events: none;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8);
         }
 
-        .crit-20 { color: var(--success-color); }
-        .crit-1 { color: var(--danger-color); }
+        .d20-icon.spinning {
+            animation: roll3D 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes roll3D {
+            0% {
+                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.4);
+                opacity: 0.5;
+            }
+            50% {
+                transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg) scale(1.2);
+            }
+            100% {
+                transform: rotateX(1080deg) rotateY(720deg) rotateZ(360deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .crit-20 { color: var(--success-color) !important; text-shadow: 0 0 8px var(--success-color); }
+        .crit-1 { color: var(--danger-color) !important; text-shadow: 0 0 8px var(--danger-color); }
 
         .details {
             font-size: 0.8rem;
@@ -277,6 +324,117 @@
             font-weight: 600;
         }
 
+        /* --- BIG OVERLAY DICE MODAL OPTIMIZADO --- */
+        .dice-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 7, 15, 0.82);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .dice-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .overlay-stage {
+            width: 220px;
+            height: 220px;
+            perspective: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .overlay-d20 {
+            width: 190px;
+            height: 190px;
+            position: relative;
+            transform-style: preserve-3d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Forzar aceleración por hardware */
+            will-change: transform, opacity;
+        }
+
+        .overlay-d20 svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--card-bg);
+            stroke: var(--accent-color);
+            stroke-width: 2.5;
+            /* Sombra fija de caja ligera en lugar de drop-shadow pesado sobre el SVG */
+            filter: drop-shadow(0 0 10px var(--accent-color));
+        }
+
+        .overlay-d20 .overlay-number {
+            position: absolute;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #ffffff;
+            pointer-events: none;
+            text-shadow: 0 0 12px rgba(0,0,0,0.9);
+        }
+
+        .overlay-d20.spinning {
+            animation: roll3DBig 0.85s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+        }
+
+        @keyframes roll3DBig {
+            0% {
+                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.2);
+                opacity: 0.3;
+            }
+            50% {
+                transform: rotateX(1080deg) rotateY(540deg) rotateZ(270deg) scale(1.35);
+            }
+            100% {
+                transform: rotateX(1440deg) rotateY(1080deg) rotateZ(360deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .overlay-info {
+            text-align: center;
+            max-width: 380px;
+            padding: 0 20px;
+        }
+
+        .overlay-title {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overlay-breakdown {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .overlay-close-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* --- STATS & FOOTER --- */
         .stats {
             display: flex;
             justify-content: space-between;
@@ -343,7 +501,7 @@
         }
 
         .preset-editor-list {
-            max-height: 180px;
+            max-height: 160px;
             overflow-y: auto;
             margin-bottom: 10px;
             padding-right: 4px;
@@ -500,9 +658,20 @@
 
             <div class="result-box" id="resultBox">
                 <div class="details" id="actionName"></div>
-                <div class="die-result-container">
-                    <div class="die-result" id="finalTotal">0</div>
+                
+                <div class="dice-stage">
+                    <div class="d20-icon" id="d20Icon">
+                        <svg viewBox="0 0 100 100">
+                            <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" />
+                            <polyline points="50,5 50,95" />
+                            <polyline points="10,25 90,75" />
+                            <polyline points="10,75 90,25" />
+                            <polygon points="50,25 75,65 25,65" />
+                        </svg>
+                        <span class="d20-number" id="finalTotal">0</span>
+                    </div>
                 </div>
+
                 <div class="details" id="breakdown"></div>
             </div>
         </div>
@@ -527,6 +696,11 @@
                 <input type="checkbox" id="soundToggle" checked style="width: auto;">
             </div>
 
+            <div class="setting-toggle">
+                <span>Modo Dado Grande Centrado (Superpuesto)</span>
+                <input type="checkbox" id="overlayDiceToggle" checked style="width: auto;">
+            </div>
+
             <label>Editor de Presets:</label>
             <div class="preset-editor-list" id="presetEditorList"></div>
         </div>
@@ -548,10 +722,30 @@
     </div>
 </div>
 
+<!-- OVERLAY SUPERPUESTO PARA DADO GRANDE -->
+<div class="dice-overlay" id="diceOverlay" onclick="closeOverlay()">
+    <div class="overlay-stage">
+        <div class="overlay-d20" id="overlayD20">
+            <svg viewBox="0 0 100 100">
+                <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" />
+                <polyline points="50,5 50,95" />
+                <polyline points="10,25 90,75" />
+                <polyline points="10,75 90,25" />
+                <polygon points="50,25 75,65 25,65" />
+            </svg>
+            <span class="overlay-number" id="overlayTotal">?</span>
+        </div>
+    </div>
+    <div class="overlay-info">
+        <div class="overlay-title" id="overlayActionName">Tirada Libre</div>
+        <div class="overlay-breakdown" id="overlayBreakdown">---</div>
+        <div class="overlay-close-hint">( Haz clic en cualquier lugar para cerrar )</div>
+    </div>
+</div>
+
 <div class="credits-footer">creado por prox</div>
 
 <script>
-    // PRESETS POR DEFECTO AHORA TODOS EN 0
     const defaultPresets = [
         { name: "Ataque Principal", mod: 0 },
         { name: "Ataque Mágico / Conjuro", mod: 0 },
@@ -572,6 +766,8 @@
     let userPresets = [];
     let totalRolls = 0;
     let sumRawRolls = 0;
+    let rollTimer = null;
+    let animInterval = null;
 
     function setTheme(styleNum) {
         document.body.classList.remove('theme-style2', 'theme-style3');
@@ -597,14 +793,14 @@
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(120, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            osc.frequency.setValueAtTime(140, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
             osc.connect(gain);
             gain.connect(ctx.destination);
             osc.start();
-            osc.stop(ctx.currentTime + 0.1);
+            osc.stop(ctx.currentTime + 0.15);
         } catch(e) {}
     }
 
@@ -635,6 +831,10 @@
     function toggleHistory() {
         const panel = document.getElementById('historyPanel');
         panel.classList.toggle('active');
+    }
+
+    function closeOverlay() {
+        document.getElementById('diceOverlay').classList.remove('active');
     }
 
     function renderPresetDropdown() {
@@ -732,9 +932,23 @@
 
     function rollD20(mode) {
         playDiceSound();
+
+        if (rollTimer) clearTimeout(rollTimer);
+        if (animInterval) clearInterval(animInterval);
+
+        const isOverlayMode = document.getElementById('overlayDiceToggle').checked;
+
+        const d20Icon = document.getElementById('d20Icon');
+        const finalTotalEl = document.getElementById('finalTotal');
+        const resultBox = document.getElementById('resultBox');
+
+        const overlay = document.getElementById('diceOverlay');
+        const overlayD20 = document.getElementById('overlayD20');
+        const overlayTotalEl = document.getElementById('overlayTotal');
+
         const actionInput = document.getElementById('action').value.trim();
         const modInput = parseInt(document.getElementById('modifier').value) || 0;
-        
+
         let roll1 = Math.floor(Math.random() * 20) + 1;
         let roll2 = Math.floor(Math.random() * 20) + 1;
         let selectedRoll = roll1;
@@ -750,40 +964,89 @@
 
         const total = selectedRoll + modInput;
 
-        totalRolls++;
-        sumRawRolls += selectedRoll;
-        document.getElementById('totalRollsCount').textContent = totalRolls;
-        document.getElementById('avgRoll').textContent = (sumRawRolls / totalRolls).toFixed(1);
+        // Limpiar clases de critico previo
+        finalTotalEl.className = 'd20-number';
+        overlayTotalEl.className = 'overlay-number';
 
-        const resultBox = document.getElementById('resultBox');
-        const actionNameEl = document.getElementById('actionName');
-        const finalTotalEl = document.getElementById('finalTotal');
-        const breakdownEl = document.getElementById('breakdown');
-        const historyList = document.getElementById('historyList');
+        if (isOverlayMode) {
+            overlay.classList.add('active');
+            overlayD20.classList.remove('spinning');
+            void overlayD20.offsetWidth;
+            overlayD20.classList.add('spinning');
 
-        actionNameEl.textContent = actionInput ? `Acción: ${actionInput}` : 'Tirada Libre';
-        finalTotalEl.textContent = total;
+            resultBox.classList.add('visible');
+            d20Icon.classList.remove('spinning');
 
-        finalTotalEl.className = 'die-result';
-        let critTag = '';
-        if (selectedRoll === 20) {
-            finalTotalEl.classList.add('crit-20');
-            critTag = ' ★ ¡CRÍTICO!';
-        } else if (selectedRoll === 1) {
-            finalTotalEl.classList.add('crit-1');
-            critTag = ' ✖ ¡FALLO CRÍTICO!';
+            // Optimización: Mostrar un signo de interrogación durante el giro en lugar de forzar repintados continuos
+            overlayTotalEl.textContent = '?';
+            finalTotalEl.textContent = '?';
+
+            // Reducida la frecuencia de cambio de números a 120ms para evitar saturate CPU/GPU
+            animInterval = setInterval(() => {
+                const randVal = Math.floor(Math.random() * 20) + 1;
+                overlayTotalEl.textContent = randVal;
+                finalTotalEl.textContent = randVal;
+            }, 120);
+
+        } else {
+            closeOverlay();
+            d20Icon.classList.remove('spinning');
+            void d20Icon.offsetWidth;
+            d20Icon.classList.add('spinning');
+            resultBox.classList.add('visible');
+
+            finalTotalEl.textContent = '?';
+
+            animInterval = setInterval(() => {
+                const randVal = Math.floor(Math.random() * 20) + 1;
+                finalTotalEl.textContent = randVal;
+            }, 120);
         }
 
-        const modSign = modInput >= 0 ? `+ ${modInput}` : `- ${Math.abs(modInput)}`;
-        breakdownEl.textContent = `Dado: ${selectedRoll} (${modSign})${modeText}${critTag}`;
+        // Al finalizar la animación (800ms)
+        rollTimer = setTimeout(() => {
+            clearInterval(animInterval);
 
-        resultBox.classList.add('visible');
+            finalTotalEl.textContent = total;
+            overlayTotalEl.textContent = total;
 
-        const historyItem = document.createElement('div');
-        historyItem.className = 'history-item';
-        const nameText = actionInput ? `${actionInput}: ` : '';
-        historyItem.textContent = `${nameText}Total ${total} (Dado ${selectedRoll} ${modSign})${modeText}`;
-        historyList.prepend(historyItem);
+            d20Icon.classList.remove('spinning');
+            overlayD20.classList.remove('spinning');
+
+            let critTag = '';
+            if (selectedRoll === 20) {
+                finalTotalEl.classList.add('crit-20');
+                overlayTotalEl.classList.add('crit-20');
+                critTag = ' ★ ¡CRÍTICO!';
+            } else if (selectedRoll === 1) {
+                finalTotalEl.classList.add('crit-1');
+                overlayTotalEl.classList.add('crit-1');
+                critTag = ' ✖ ¡FALLO CRÍTICO!';
+            }
+
+            const actionNameText = actionInput ? `Acción: ${actionInput}` : 'Tirada Libre';
+            const modSign = modInput >= 0 ? `+ ${modInput}` : `- ${Math.abs(modInput)}`;
+            const breakdownText = `Dado: ${selectedRoll} (${modSign})${modeText}${critTag}`;
+
+            document.getElementById('actionName').textContent = actionNameText;
+            document.getElementById('breakdown').textContent = breakdownText;
+
+            document.getElementById('overlayActionName').textContent = actionNameText;
+            document.getElementById('overlayBreakdown').textContent = breakdownText;
+
+            totalRolls++;
+            sumRawRolls += selectedRoll;
+            document.getElementById('totalRollsCount').textContent = totalRolls;
+            document.getElementById('avgRoll').textContent = (sumRawRolls / totalRolls).toFixed(1);
+
+            const historyList = document.getElementById('historyList');
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            const nameText = actionInput ? `${actionInput}: ` : '';
+            historyItem.textContent = `${nameText}Total ${total} (Dado ${selectedRoll} ${modSign})${modeText}`;
+            historyList.prepend(historyItem);
+
+        }, 800);
     }
 
     init();
