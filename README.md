@@ -1,52 +1,56 @@
-# 🎲 D20 Universal Roller Pro / Lanzador de d20 Universal Pro
+# 🎲 Lanzador de d20 Universal Pro / Universal d20 Roller Pro
 
-[Español](#español) | [English](#english)
+Herramienta web ligera y personalizable para lanzar dados d20 con modificadores, presets de D&D/Rol e historial de tiradas.  
+*A lightweight and customizable web tool for d20 dice rolling with modifiers, TTRPG/D&D presets, and roll history.*
+
+👉 **[Probar la aplicación / Live Demo](https://prox97z.github.io/lanzador-d20/)**
 
 ---
 
-<a name="español"></a>
 ## 🇪🇸 Español
 
-Una herramienta web avanzada, fluida y totalmente personalizable diseñada para lanzar dados de 20 caras (d20) en juegos de rol de mesa (TTRPG) como Dungeons & Dragons, Pathfinder y otros sistemas. 
+### 📌 Sobre este proyecto
+Este es un proyecto personal creado por **Prox** por gusto y diversión para facilitar las tiradas en partidas de rol.
 
-Esta versión ha sido **altamente optimizada para un rendimiento fluido** incluso en equipos con tarjetas gráficas integradas o de gama baja, eliminando tirones (*lag*) durante las animaciones 3D.
+> ⚠️ **Nota:** No soy programador. Este proyecto fue desarrollado utilizando **Inteligencia Artificial** como asistente de código para dar forma a la idea, diseño y lógica de la herramienta.
 
-### ✨ Características Principales
+### ✨ Características
+* 🚀 **Sin lag (Ultra fluido):** Altamente optimizado mediante aceleración por hardware para funcionar sin caídas de fotogramas en computadoras sencillas o laptops.
+* 🎲 **Modo Dado Grande (Overlay):** Modo con animación 3D centrado a pantalla completa para mayor visibilidad al transmitir o jugar en vivo.
+* ⚡ **Ventaja y Desventaja:** Lanza dos dados simultáneamente seleccionando automáticamente el resultado más alto o más bajo.
+* 🛠️ **Presets personalizables:** Configuración y guardado local rápido para ataques, habilidades y salvaciones.
+* 📊 **Historial e indicadores:** Registro en tiempo real de tiradas previas junto a un calculador automático de promedio.
+* 🎨 **3 Temas visuales:** Alterna al instante entre las interfaces Violeta, Neón y Rojo Tinto.
+* 🔊 **Efectos de sonido:** Retroalimentación de audio ligera integrada al lanzar el dado.
+* 📱 **Diseño Adaptativo:** Funciona en PC, laptops y dispositivos móviles.
 
-* 🚀 **Animaciones 3D Ultra Fluidas:** Optimizado mediante aceleración por hardware CSS y renderizado eficiente para evitar caídas de fotogramas.
-* 🎲 **Modo de Dado Grande Centrado (Overlay):** Visualiza las tiradas en pantalla completa con una animación 3D de alta visibilidad, ideal para compartir pantalla o jugar en vivo.
-* ⚡ **Soporte para Ventaja y Desventaja:** Lanza dos dados simultáneamente y calcula automáticamente el resultado mayor o menor según la regla aplicada.
-* 🛠️ **Gestor de Presets Personalizable:** Edita, guarda y elimina modificadores predeterminados (Ataque, Iniciativa, Habilidades, Salvaciones) guardados localmente en tu navegador.
-* 📊 **Historial y Estadísticas:** Lleva un registro en tiempo real de tus tiradas anteriores y consulta el promedio acumulado de tus dados.
-* 🎨 **Temas Visuales:** Cambia al instante entre varios estilos de interfaz (Violeta, Neón y Rojo Tinto).
-* 🔊 **Efectos de Sonido Sintetizados:** Feedback auditivo generado mediante la API de Web Audio (sin necesidad de cargar archivos de audio externos).
-* 📱 **Diseño Adaptativo (Responsive):** Funciona perfectamente en computadoras de escritorio, laptops y dispositivos móviles.
+### 💬 Sugerencias y Comentarios
+¿Tienes alguna idea para mejorar la herramienta o encontraste algún error?  
+¡Eres libre de abrir una sugerencia o dejar tus comentarios directamente en el **canal de sugerencias / sección de Issues** de este repositorio! Toda idea es bienvenida.
 
 ---
 
-<a name="english"></a>
 ## us EN - English
 
-An advanced, smooth, and fully customizable web tool designed for rolling 20-sided dice (d20) in tabletop role-playing games (TTRPGs) such as Dungeons & Dragons, Pathfinder, and similar systems.
+### 📌 About this project
+This is a personal project created by **Prox** just for fun, designed to streamline dice rolling during tabletop RPG sessions.
 
-This version has been **heavily optimized for buttery-smooth performance** even on integrated or low-end GPUs, eliminating animation stuttering and lag during 3D rolls.
+> ⚠️ **Note:** I am not a programmer. This project was built using **Artificial Intelligence** as a coding assistant to bring the overall idea, design, and logic to life.
 
-### ✨ Key Features
+### ✨ Features
+* 🚀 **Lag-Free Performance:** Highly optimized with CSS hardware acceleration to run smoothly on low-end hardware and laptops without frame drops.
+* 🎲 **Centered Big Dice Mode (Overlay):** Full-screen 3D animation mode for enhanced visibility during live sessions or screen sharing.
+* ⚡ **Advantage & Disadvantage:** Roll two dice simultaneously with automatic calculation of the highest or lowest result.
+* 🛠️ **Customizable Presets:** Quick configuration and local saving for attacks, skill checks, and saving throws.
+* 📊 **History & Stats:** Real-time logging of past rolls along with an automatic average calculator.
+* 🎨 **3 Visual Themes:** Toggle seamlessly between Purple, Neon, and Dark Red interfaces.
+* 🔊 **Sound Effects:** Built-in lightweight audio feedback when rolling.
+* 📱 **Responsive Design:** Seamless performance on desktop, laptop, and mobile screens.
 
-* 🚀 **Ultra-Smooth 3D Animations:** Optimized using CSS hardware acceleration and efficient JavaScript rendering to prevent frame drops.
-* 🎲 **Centered Big Dice Overlay Mode:** View rolls in full screen with high-visibility 3D dice animations—perfect for screen sharing or live sessions.
-* ⚡ **Advantage & Disadvantage Support:** Roll two dice simultaneously with automatic selection of the highest or lowest result.
-* 🛠️ **Customizable Preset Manager:** Edit, save, and manage default skill/attack modifiers locally stored in your browser.
-* 📊 **History & Live Statistics:** Track all your previous rolls in real-time and monitor your average roll performance.
-* 🎨 **Multiple Visual Themes:** Instant switching between unique UI themes (Purple, Neon, and Dark Red).
-* 🔊 **Synthesized Audio Effects:** Built-in audio feedback powered by the Web Audio API (no external sound assets required).
-* 📱 **Fully Responsive:** Seamless layout designed for desktop, laptop, and mobile screens.
+### 💬 Feedback & Suggestions
+Got an idea to make this tool better or found a bug?  
+Feel free to open an issue or leave your feedback directly in the **Suggestions Channel / Issues section** on this repository! All ideas are welcome.
 
 ---
 
-### 👤 Author / Autor
-
-Created with ❤️ by **Prox** / Creado con ❤️ por **Prox**
----
-
-*Creado por Prox / Created by Prox*
+**Creado con ❤️ por Prox / Created with ❤️ by Prox**
