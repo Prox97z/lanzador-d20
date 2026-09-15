@@ -19,6 +19,7 @@
             --result-bg: #090d16;
             --card-radius: 16px;
             --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --glow-color: rgba(139, 92, 246, 0.6);
         }
 
         body.theme-style2 {
@@ -34,6 +35,7 @@
             --danger-color: #f43f5e;
             --result-bg: #05050a;
             --card-radius: 12px;
+            --glow-color: rgba(6, 182, 212, 0.6);
         }
 
         body.theme-style3 {
@@ -49,6 +51,7 @@
             --danger-color: #ef4444;
             --result-bg: #050102;
             --card-radius: 14px;
+            --glow-color: rgba(153, 27, 27, 0.6);
         }
 
         * {
@@ -235,7 +238,7 @@
             border-color: var(--accent-color);
         }
 
-        /* --- RESULT BOX & SMALL INTEGRATED DICE --- */
+        /* --- CAJA DE RESULTADOS Y DADO INTEGRADO --- */
         .result-box {
             height: 115px;
             padding: 10px;
@@ -252,12 +255,25 @@
             margin-top: 8px;
             position: relative;
             overflow: hidden;
-            transition: opacity 0.2s ease, visibility 0.2s ease;
+            transition: opacity 0.2s ease, visibility 0.2s ease, border-color 0.3s ease;
+            cursor: pointer;
         }
 
         .result-box.visible {
             opacity: 1;
             visibility: visible;
+        }
+
+        .result-box:hover::after {
+            content: '📋 Clic para copiar resultado';
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
         }
 
         .dice-stage {
@@ -278,6 +294,8 @@
             align-items: center;
             justify-content: center;
             will-change: transform, opacity;
+            border-radius: 50%;
+            transition: filter 0.3s ease;
         }
 
         .d20-icon svg {
@@ -286,6 +304,7 @@
             fill: var(--card-bg);
             stroke: var(--accent-color);
             stroke-width: 2;
+            transition: stroke 0.3s ease;
         }
 
         .d20-number {
@@ -299,6 +318,28 @@
 
         .d20-icon.spinning {
             animation: roll3D 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            filter: none !important;
+        }
+
+        /* RESALTADO Y AURA LUMINOSA */
+        .highlight-normal {
+            filter: drop-shadow(0 0 8px var(--glow-color));
+        }
+
+        .highlight-crit-20 {
+            filter: drop-shadow(0 0 14px var(--success-color));
+        }
+
+        .highlight-crit-20 svg {
+            stroke: var(--success-color) !important;
+        }
+
+        .highlight-crit-1 {
+            filter: drop-shadow(0 0 14px var(--danger-color));
+        }
+
+        .highlight-crit-1 svg {
+            stroke: var(--danger-color) !important;
         }
 
         @keyframes roll3D {
@@ -324,14 +365,34 @@
             font-weight: 600;
         }
 
-        /* --- BIG OVERLAY DICE MODAL OPTIMIZADO --- */
+        /* Toast indicador al copiar */
+        .copy-toast {
+            position: absolute;
+            bottom: 6px;
+            background: var(--accent-color);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 5;
+        }
+
+        .copy-toast.show {
+            opacity: 1;
+        }
+
+        /* --- DADO OVERLAY SUPERPUESTO --- */
         .dice-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(5, 7, 15, 0.82);
+            background: rgba(5, 7, 15, 0.85);
             z-index: 1000;
             display: flex;
             flex-direction: column;
@@ -345,6 +406,22 @@
         .dice-overlay.active {
             opacity: 1;
             pointer-events: auto;
+        }
+
+        .overlay-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(21, 28, 44, 0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s ease;
+        }
+
+        .overlay-card:hover {
+            background: rgba(21, 28, 44, 0.7);
         }
 
         .overlay-stage {
@@ -365,8 +442,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Forzar aceleración por hardware */
             will-change: transform, opacity;
+            border-radius: 50%;
+            transition: filter 0.3s ease;
         }
 
         .overlay-d20 svg {
@@ -375,8 +453,7 @@
             fill: var(--card-bg);
             stroke: var(--accent-color);
             stroke-width: 2.5;
-            /* Sombra fija de caja ligera en lugar de drop-shadow pesado sobre el SVG */
-            filter: drop-shadow(0 0 10px var(--accent-color));
+            transition: stroke 0.3s ease;
         }
 
         .overlay-d20 .overlay-number {
@@ -390,6 +467,7 @@
 
         .overlay-d20.spinning {
             animation: roll3DBig 0.85s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+            filter: none !important;
         }
 
         @keyframes roll3DBig {
@@ -425,16 +503,31 @@
             font-size: 0.95rem;
             color: var(--text-main);
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
-        .overlay-close-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
+        .overlay-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
         }
 
-        /* --- STATS & FOOTER --- */
+        .btn-overlay-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .btn-overlay-action:hover {
+            border-color: var(--accent-color);
+        }
+
+        /* --- ESTADÍSTICAS Y PANEL HISTORIAL --- */
         .stats {
             display: flex;
             justify-content: space-between;
@@ -656,7 +749,8 @@
                 <button class="btn-alt" onclick="rollD20('adv')">Ventaja</button>
             </div>
 
-            <div class="result-box" id="resultBox">
+            <!-- RESULTADO: Se copia UNICAMENTE al hacer clic manualmente -->
+            <div class="result-box" id="resultBox" onclick="copyResultToClipboard()">
                 <div class="details" id="actionName"></div>
                 
                 <div class="dice-stage">
@@ -673,6 +767,7 @@
                 </div>
 
                 <div class="details" id="breakdown"></div>
+                <div class="copy-toast" id="copyToast">¡Copiado al portapapeles!</div>
             </div>
         </div>
 
@@ -722,24 +817,29 @@
     </div>
 </div>
 
-<!-- OVERLAY SUPERPUESTO PARA DADO GRANDE -->
-<div class="dice-overlay" id="diceOverlay" onclick="closeOverlay()">
-    <div class="overlay-stage">
-        <div class="overlay-d20" id="overlayD20">
-            <svg viewBox="0 0 100 100">
-                <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" />
-                <polyline points="50,5 50,95" />
-                <polyline points="10,25 90,75" />
-                <polyline points="10,75 90,25" />
-                <polygon points="50,25 75,65 25,65" />
-            </svg>
-            <span class="overlay-number" id="overlayTotal">?</span>
+<!-- DADO GRANDE CENTRADO -->
+<div class="dice-overlay" id="diceOverlay" onclick="closeOverlayOnBackground(event)">
+    <div class="overlay-card" onclick="copyResultToClipboard()">
+        <div class="overlay-stage">
+            <div class="overlay-d20" id="overlayD20">
+                <svg viewBox="0 0 100 100">
+                    <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" />
+                    <polyline points="50,5 50,95" />
+                    <polyline points="10,25 90,75" />
+                    <polyline points="10,75 90,25" />
+                    <polygon points="50,25 75,65 25,65" />
+                </svg>
+                <span class="overlay-number" id="overlayTotal">?</span>
+            </div>
         </div>
-    </div>
-    <div class="overlay-info">
-        <div class="overlay-title" id="overlayActionName">Tirada Libre</div>
-        <div class="overlay-breakdown" id="overlayBreakdown">---</div>
-        <div class="overlay-close-hint">( Haz clic en cualquier lugar para cerrar )</div>
+        <div class="overlay-info">
+            <div class="overlay-title" id="overlayActionName">Tirada Libre</div>
+            <div class="overlay-breakdown" id="overlayBreakdown">---</div>
+            <div class="overlay-actions">
+                <button class="btn-overlay-action" onclick="copyResultToClipboard(); event.stopPropagation();">📋 Copiar Resultado</button>
+                <button class="btn-overlay-action" onclick="closeOverlay(); event.stopPropagation();">✕ Cerrar</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -768,6 +868,20 @@
     let sumRawRolls = 0;
     let rollTimer = null;
     let animInterval = null;
+    let lastRollFormatted = "";
+
+    // Web Audio API
+    let audioCtx = null;
+
+    function getAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    }
 
     function setTheme(styleNum) {
         document.body.classList.remove('theme-style2', 'theme-style3');
@@ -786,21 +900,35 @@
         }
     }
 
+    function getRandomD20() {
+        if (window.crypto && window.crypto.getRandomValues) {
+            const arr = new Uint32Array(1);
+            window.crypto.getRandomValues(arr);
+            return (arr[0] % 20) + 1;
+        }
+        return Math.floor(Math.random() * 20) + 1;
+    }
+
     function playDiceSound() {
         if (!document.getElementById('soundToggle').checked) return;
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const ctx = getAudioContext();
+            const now = ctx.currentTime;
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
+            
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(140, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+            osc.frequency.setValueAtTime(140, now);
+            osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+            
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            
             osc.connect(gain);
             gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.15);
+            
+            osc.start(now);
+            osc.stop(now + 0.15);
         } catch(e) {}
     }
 
@@ -813,6 +941,19 @@
         }
         renderPresetDropdown();
         renderPresetEditor();
+
+        // Atajo Tecla Espacio para lanzar
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === ' ') {
+                const activeEl = document.activeElement;
+                const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
+                
+                if (!isTyping) {
+                    e.preventDefault();
+                    rollD20('normal');
+                }
+            }
+        });
     }
 
     function switchTab(tabId) {
@@ -835,6 +976,24 @@
 
     function closeOverlay() {
         document.getElementById('diceOverlay').classList.remove('active');
+    }
+
+    function closeOverlayOnBackground(e) {
+        if (e.target.id === 'diceOverlay') {
+            closeOverlay();
+        }
+    }
+
+    // FUNCIÓN DE COPIADO MANUAL AL PORTAPAPELES
+    function copyResultToClipboard() {
+        if (!lastRollFormatted) return;
+        navigator.clipboard.writeText(lastRollFormatted).then(() => {
+            const toast = document.getElementById('copyToast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1500);
+        }).catch(err => {
+            console.error('Error al copiar: ', err);
+        });
     }
 
     function renderPresetDropdown() {
@@ -934,7 +1093,7 @@
         playDiceSound();
 
         if (rollTimer) clearTimeout(rollTimer);
-        if (animInterval) clearInterval(animInterval);
+        if (animInterval) cancelAnimationFrame(animInterval);
 
         const isOverlayMode = document.getElementById('overlayDiceToggle').checked;
 
@@ -949,8 +1108,8 @@
         const actionInput = document.getElementById('action').value.trim();
         const modInput = parseInt(document.getElementById('modifier').value) || 0;
 
-        let roll1 = Math.floor(Math.random() * 20) + 1;
-        let roll2 = Math.floor(Math.random() * 20) + 1;
+        let roll1 = getRandomD20();
+        let roll2 = getRandomD20();
         let selectedRoll = roll1;
         let modeText = '';
 
@@ -964,9 +1123,11 @@
 
         const total = selectedRoll + modInput;
 
-        // Limpiar clases de critico previo
         finalTotalEl.className = 'd20-number';
         overlayTotalEl.className = 'overlay-number';
+
+        d20Icon.classList.remove('highlight-normal', 'highlight-crit-20', 'highlight-crit-1');
+        overlayD20.classList.remove('highlight-normal', 'highlight-crit-20', 'highlight-crit-1');
 
         if (isOverlayMode) {
             overlay.classList.add('active');
@@ -977,16 +1138,20 @@
             resultBox.classList.add('visible');
             d20Icon.classList.remove('spinning');
 
-            // Optimización: Mostrar un signo de interrogación durante el giro en lugar de forzar repintados continuos
             overlayTotalEl.textContent = '?';
             finalTotalEl.textContent = '?';
 
-            // Reducida la frecuencia de cambio de números a 120ms para evitar saturate CPU/GPU
-            animInterval = setInterval(() => {
-                const randVal = Math.floor(Math.random() * 20) + 1;
-                overlayTotalEl.textContent = randVal;
-                finalTotalEl.textContent = randVal;
-            }, 120);
+            let lastUpdate = performance.now();
+            const updateFrame = (now) => {
+                if (now - lastUpdate > 80) {
+                    const randVal = getRandomD20();
+                    overlayTotalEl.textContent = randVal;
+                    finalTotalEl.textContent = randVal;
+                    lastUpdate = now;
+                }
+                animInterval = requestAnimationFrame(updateFrame);
+            };
+            animInterval = requestAnimationFrame(updateFrame);
 
         } else {
             closeOverlay();
@@ -997,15 +1162,20 @@
 
             finalTotalEl.textContent = '?';
 
-            animInterval = setInterval(() => {
-                const randVal = Math.floor(Math.random() * 20) + 1;
-                finalTotalEl.textContent = randVal;
-            }, 120);
+            let lastUpdate = performance.now();
+            const updateFrame = (now) => {
+                if (now - lastUpdate > 80) {
+                    const randVal = getRandomD20();
+                    finalTotalEl.textContent = randVal;
+                    lastUpdate = now;
+                }
+                animInterval = requestAnimationFrame(updateFrame);
+            };
+            animInterval = requestAnimationFrame(updateFrame);
         }
 
-        // Al finalizar la animación (800ms)
         rollTimer = setTimeout(() => {
-            clearInterval(animInterval);
+            if (animInterval) cancelAnimationFrame(animInterval);
 
             finalTotalEl.textContent = total;
             overlayTotalEl.textContent = total;
@@ -1017,16 +1187,26 @@
             if (selectedRoll === 20) {
                 finalTotalEl.classList.add('crit-20');
                 overlayTotalEl.classList.add('crit-20');
+                d20Icon.classList.add('highlight-crit-20');
+                overlayD20.classList.add('highlight-crit-20');
                 critTag = ' ★ ¡CRÍTICO!';
             } else if (selectedRoll === 1) {
                 finalTotalEl.classList.add('crit-1');
                 overlayTotalEl.classList.add('crit-1');
+                d20Icon.classList.add('highlight-crit-1');
+                overlayD20.classList.add('highlight-crit-1');
                 critTag = ' ✖ ¡FALLO CRÍTICO!';
+            } else {
+                d20Icon.classList.add('highlight-normal');
+                overlayD20.classList.add('highlight-normal');
             }
 
             const actionNameText = actionInput ? `Acción: ${actionInput}` : 'Tirada Libre';
             const modSign = modInput >= 0 ? `+ ${modInput}` : `- ${Math.abs(modInput)}`;
             const breakdownText = `Dado: ${selectedRoll} (${modSign})${modeText}${critTag}`;
+
+            // Formato guardado internamente (solo se copia si haces clic)
+            lastRollFormatted = `${actionInput ? actionInput + ': ' : ''}Total ${total} (Dado: ${selectedRoll} ${modSign})${modeText}${critTag}`;
 
             document.getElementById('actionName').textContent = actionNameText;
             document.getElementById('breakdown').textContent = breakdownText;
@@ -1042,8 +1222,7 @@
             const historyList = document.getElementById('historyList');
             const historyItem = document.createElement('div');
             historyItem.className = 'history-item';
-            const nameText = actionInput ? `${actionInput}: ` : '';
-            historyItem.textContent = `${nameText}Total ${total} (Dado ${selectedRoll} ${modSign})${modeText}`;
+            historyItem.textContent = lastRollFormatted;
             historyList.prepend(historyItem);
 
         }, 800);
