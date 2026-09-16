@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lanzador de d20 Universal Pro - Animado Optimizado</title>
+    <title>Lanzador Anti-Trampas Pro & Ficha</title>
     <style>
         :root {
             --bg-color: #0b0f19;
+            --bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0b0f19 70%);
             --card-bg: #151c2c;
             --accent-color: #8b5cf6;
             --accent-hover: #7c3aed;
@@ -19,11 +20,11 @@
             --result-bg: #090d16;
             --card-radius: 16px;
             --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            --glow-color: rgba(139, 92, 246, 0.6);
         }
 
         body.theme-style2 {
             --bg-color: #05050a;
+            --bg-gradient: radial-gradient(circle at 50% 0%, #164e63 0%, #05050a 70%);
             --card-bg: #0e121e;
             --accent-color: #06b6d4;
             --accent-hover: #0891b2;
@@ -35,11 +36,11 @@
             --danger-color: #f43f5e;
             --result-bg: #05050a;
             --card-radius: 12px;
-            --glow-color: rgba(6, 182, 212, 0.6);
         }
 
         body.theme-style3 {
             --bg-color: #0a0203;
+            --bg-gradient: radial-gradient(circle at 50% 0%, #450a0a 0%, #0a0203 70%);
             --card-bg: #1a080a;
             --accent-color: #991b1b;
             --accent-hover: #b91c1c;
@@ -51,31 +52,50 @@
             --danger-color: #ef4444;
             --result-bg: #050102;
             --card-radius: 14px;
-            --glow-color: rgba(153, 27, 27, 0.6);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-family);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-color) 70%);
+            background-image: var(--bg-gradient);
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             padding: 16px;
             position: relative;
             overflow-x: hidden;
+            transition: background 0.3s ease;
         }
 
-        body.theme-style3 {
-            background-image: radial-gradient(circle at 50% 0%, #450a0a 0%, var(--bg-color) 70%);
+        body.shake-fail {
+            animation: shakeScreen 0.4s ease-in-out;
+            border: 8px solid var(--danger-color);
+        }
+
+        @keyframes shakeScreen {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-10px, 5px); }
+            40% { transform: translate(10px, -5px); }
+            60% { transform: translate(-6px, 3px); }
+            80% { transform: translate(6px, -3px); }
+        }
+
+        .crit-flash-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none; z-index: 9999; opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .crit-flash-overlay.active { opacity: 1; animation: pulseFlash 0.8s ease-out forwards; }
+
+        @keyframes pulseFlash {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(1); }
         }
 
         .card {
@@ -84,8 +104,8 @@
             border-radius: var(--card-radius);
             padding: 24px;
             width: 100%;
-            max-width: 440px;
-            height: 640px;
+            max-width: 650px;
+            min-height: 700px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -94,641 +114,284 @@
             z-index: 1;
         }
 
-        .header {
+        .header { text-align: center; margin-bottom: 12px; }
+        h1 { font-size: 1.5rem; color: var(--accent-color); letter-spacing: 1px; text-transform: uppercase; }
+        .subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+        .anti-cheat-banner {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger-color);
+            color: #fca5a5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
             text-align: center;
-            margin-bottom: 12px;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            color: var(--accent-color);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .subtitle {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 4px;
+            margin-bottom: 10px;
+            display: none;
+            font-weight: bold;
         }
 
         .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-            background: var(--input-bg);
-            padding: 4px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            display: flex; gap: 8px; margin-bottom: 14px;
+            background: var(--input-bg); padding: 4px;
+            border-radius: 10px; border: 1px solid var(--border-color);
         }
 
         .tab-btn {
-            flex: 1;
-            padding: 8px;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
+            flex: 1; padding: 8px; background: transparent; border: none;
+            color: var(--text-muted); border-radius: 6px; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600;
         }
 
-        .tab-btn.active {
-            background-color: var(--accent-color);
-            color: #ffffff;
+        .tab-btn.active { background-color: var(--accent-color); color: #ffffff; }
+        .tab-content { display: none; flex: 1; }
+        .tab-content.active { display: flex; flex-direction: column; justify-content: space-between; }
+
+        .sub-tabs {
+            display: flex; gap: 6px; margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.2); padding: 4px; border-radius: 8px; flex-wrap: wrap;
         }
 
-        .tab-content {
-            display: none;
-            flex: 1;
+        .sub-tab-btn {
+            flex: 1; padding: 6px; background: transparent; border: 1px solid transparent;
+            color: var(--text-muted); border-radius: 6px; cursor: pointer;
+            font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease; white-space: nowrap;
         }
 
-        .tab-content.active {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+        .sub-tab-btn.active {
+            background-color: var(--input-bg);
+            border-color: var(--border-color);
+            color: var(--accent-color);
         }
 
-        .form-group {
-            margin-bottom: 10px;
-        }
+        .sub-tab-content { display: none; flex: 1; flex-direction: column; gap: 10px; }
+        .sub-tab-content.active { display: flex; }
+
+        .form-group { margin-bottom: 10px; }
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .grid-6col { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 
         label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            display: block; font-size: 0.8rem; color: var(--text-muted);
+            margin-bottom: 4px; font-weight: 600; text-transform: uppercase;
         }
 
-        input, select {
-            width: 100%;
-            padding: 10px 12px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 0.9rem;
-            outline: none;
+        input, select, textarea {
+            width: 100%; padding: 10px 12px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            color: #ffffff; font-size: 0.9rem; outline: none;
         }
 
-        input:focus, select:focus {
-            border-color: var(--accent-color);
-        }
+        textarea { resize: vertical; min-height: 60px; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent-color); }
 
-        .mod-controls {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            margin-top: 6px;
-        }
+        .mod-controls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 6px; }
 
         .btn-small {
-            padding: 6px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.75rem;
+            padding: 6px; background-color: var(--input-bg); border: 1px solid var(--border-color);
+            color: var(--text-main); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem;
         }
 
-        .btn-small:hover {
-            border-color: var(--accent-color);
-        }
+        .btn-small:hover { border-color: var(--accent-color); }
 
-        .roll-options {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            gap: 8px;
-            margin-top: 10px;
-        }
+        .roll-options { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 8px; margin-top: 10px; }
 
         .btn-roll {
-            padding: 12px;
-            background-color: var(--accent-color);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
+            padding: 12px; background-color: var(--accent-color); color: #ffffff;
+            border: none; border-radius: 8px; font-size: 0.95rem; font-weight: bold; cursor: pointer;
         }
 
-        .btn-roll:hover {
-            background-color: var(--accent-hover);
-        }
+        .btn-roll:hover { background-color: var(--accent-hover); }
 
         .btn-alt {
-            padding: 10px;
-            background-color: var(--input-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.78rem;
-            font-weight: bold;
-            cursor: pointer;
+            padding: 10px; background-color: var(--input-bg); color: var(--text-main);
+            border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.78rem; font-weight: bold; cursor: pointer;
         }
 
-        .btn-alt:hover {
-            border-color: var(--accent-color);
-        }
-
-        /* --- CAJA DE RESULTADOS Y DADO INTEGRADO --- */
         .result-box {
-            height: 115px;
-            padding: 10px;
-            background-color: var(--result-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-            opacity: 0;
-            visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-top: 8px;
-            position: relative;
-            overflow: hidden;
-            transition: opacity 0.2s ease, visibility 0.2s ease, border-color 0.3s ease;
-            cursor: pointer;
+            min-height: 125px; padding: 12px; background-color: var(--result-bg);
+            border-radius: 12px; border: 1px solid var(--border-color);
+            text-align: center; opacity: 0; visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            margin-top: 8px; position: relative; overflow: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
 
-        .result-box.visible {
-            opacity: 1;
-            visibility: visible;
-        }
+        .result-box.visible { opacity: 1; visibility: visible; }
 
-        .result-box:hover::after {
-            content: '📋 Clic para copiar resultado';
-            position: absolute;
-            top: 4px;
-            right: 8px;
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            background: rgba(0,0,0,0.5);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .dice-stage {
-            width: 60px;
-            height: 60px;
-            perspective: 600px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .dice-stage { width: 55px; height: 55px; perspective: 600px; display: flex; align-items: center; justify-content: center; }
 
         .d20-icon {
-            width: 50px;
-            height: 50px;
-            position: relative;
-            transform-style: preserve-3d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            will-change: transform, opacity;
-            border-radius: 50%;
-            transition: filter 0.3s ease;
+            width: 48px; height: 48px; position: relative; transform-style: preserve-3d;
+            display: flex; align-items: center; justify-content: center; border-radius: 50%;
         }
 
-        .d20-icon svg {
-            width: 100%;
-            height: 100%;
-            fill: var(--card-bg);
-            stroke: var(--accent-color);
-            stroke-width: 2;
-            transition: stroke 0.3s ease;
-        }
+        .d20-icon svg { width: 100%; height: 100%; fill: var(--card-bg); stroke: var(--accent-color); stroke-width: 2; }
+        .d20-number { position: absolute; font-size: 1.25rem; font-weight: 800; color: #ffffff; }
 
-        .d20-number {
-            position: absolute;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #ffffff;
-            pointer-events: none;
-            text-shadow: 0 0 4px rgba(0,0,0,0.8);
-        }
-
-        .d20-icon.spinning {
-            animation: roll3D 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-            filter: none !important;
-        }
-
-        /* RESALTADO Y AURA LUMINOSA */
-        .highlight-normal {
-            filter: drop-shadow(0 0 8px var(--glow-color));
-        }
-
-        .highlight-crit-20 {
-            filter: drop-shadow(0 0 14px var(--success-color));
-        }
-
-        .highlight-crit-20 svg {
-            stroke: var(--success-color) !important;
-        }
-
-        .highlight-crit-1 {
-            filter: drop-shadow(0 0 14px var(--danger-color));
-        }
-
-        .highlight-crit-1 svg {
-            stroke: var(--danger-color) !important;
-        }
+        .d20-icon.spinning { animation: roll3D 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
         @keyframes roll3D {
-            0% {
-                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.4);
-                opacity: 0.5;
-            }
-            50% {
-                transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg) scale(1.2);
-            }
-            100% {
-                transform: rotateX(1080deg) rotateY(720deg) rotateZ(360deg) scale(1);
-                opacity: 1;
-            }
+            0% { transform: rotateX(0deg) scale(0.4); opacity: 0.5; }
+            50% { transform: rotateX(720deg) scale(1.2); }
+            100% { transform: rotateX(1080deg) scale(1); opacity: 1; }
         }
 
-        .crit-20 { color: var(--success-color) !important; text-shadow: 0 0 8px var(--success-color); }
-        .crit-1 { color: var(--danger-color) !important; text-shadow: 0 0 8px var(--danger-color); }
+        .crit-20 { color: var(--success-color) !important; }
+        .crit-1 { color: var(--danger-color) !important; }
 
-        .details {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 600;
+        .details { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+        .btn-copy-action {
+            margin-top: 6px; padding: 6px 14px; background: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: 6px;
+            color: var(--text-main); font-size: 0.75rem; font-weight: bold; cursor: pointer;
         }
 
-        /* Toast indicador al copiar */
-        .copy-toast {
-            position: absolute;
-            bottom: 6px;
-            background: var(--accent-color);
-            color: #fff;
-            font-size: 0.7rem;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 4px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-            z-index: 5;
-        }
-
-        .copy-toast.show {
-            opacity: 1;
-        }
-
-        /* --- DADO OVERLAY SUPERPUESTO --- */
         .dice-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(5, 7, 15, 0.85);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(5, 7, 13, 0.88); z-index: 1000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
         }
 
-        .dice-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .dice-overlay.active { opacity: 1; pointer-events: auto; }
 
-        .overlay-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            padding: 20px;
-            border-radius: 16px;
-            background: rgba(21, 28, 44, 0.4);
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: background 0.2s ease;
-        }
+        .overlay-card { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .overlay-stage { width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
 
-        .overlay-card:hover {
-            background: rgba(21, 28, 44, 0.7);
-        }
+        .overlay-d20 { width: 150px; height: 150px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .overlay-d20 svg { width: 100%; height: 100%; fill: transparent; stroke: var(--accent-color); stroke-width: 2.5; }
+        .overlay-d20 .overlay-number { position: absolute; font-size: 3.5rem; font-weight: 900; color: #ffffff; }
 
-        .overlay-stage {
-            width: 220px;
-            height: 220px;
-            perspective: 1000px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .overlay-d20 {
-            width: 190px;
-            height: 190px;
-            position: relative;
-            transform-style: preserve-3d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            will-change: transform, opacity;
-            border-radius: 50%;
-            transition: filter 0.3s ease;
-        }
-
-        .overlay-d20 svg {
-            width: 100%;
-            height: 100%;
-            fill: var(--card-bg);
-            stroke: var(--accent-color);
-            stroke-width: 2.5;
-            transition: stroke 0.3s ease;
-        }
-
-        .overlay-d20 .overlay-number {
-            position: absolute;
-            font-size: 4.5rem;
-            font-weight: 900;
-            color: #ffffff;
-            pointer-events: none;
-            text-shadow: 0 0 12px rgba(0,0,0,0.9);
-        }
-
-        .overlay-d20.spinning {
-            animation: roll3DBig 0.85s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-            filter: none !important;
-        }
+        .overlay-d20.spinning { animation: roll3DBig 0.85s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
 
         @keyframes roll3DBig {
-            0% {
-                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.2);
-                opacity: 0.3;
-            }
-            50% {
-                transform: rotateX(1080deg) rotateY(540deg) rotateZ(270deg) scale(1.35);
-            }
-            100% {
-                transform: rotateX(1440deg) rotateY(1080deg) rotateZ(360deg) scale(1);
-                opacity: 1;
-            }
+            0% { transform: rotateX(0deg) scale(0.2); opacity: 0.3; }
+            50% { transform: rotateX(720deg) scale(1.3); }
+            100% { transform: rotateX(1080deg) scale(1); opacity: 1; }
         }
 
-        .overlay-info {
-            text-align: center;
-            max-width: 380px;
-            padding: 0 20px;
-        }
-
-        .overlay-title {
-            font-size: 1.1rem;
-            color: var(--accent-color);
-            font-weight: 700;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .overlay-breakdown {
-            font-size: 0.95rem;
-            color: var(--text-main);
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .overlay-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        .btn-overlay-action {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-main);
-            cursor: pointer;
-        }
-
-        .btn-overlay-action:hover {
-            border-color: var(--accent-color);
-        }
-
-        /* --- ESTADÍSTICAS Y PANEL HISTORIAL --- */
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 8px;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .btn-history-toggle {
-            padding: 5px 10px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: var(--accent-color);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
+        .stats { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted); }
 
         .history-panel {
-            position: absolute;
-            top: 0;
-            left: 100%;
-            margin-left: 12px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--card-radius);
-            padding: 16px;
-            width: 260px;
-            height: 100%;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            display: none;
-            flex-direction: column;
-            z-index: 10;
+            position: absolute; top: 0; left: 100%; margin-left: 12px;
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: var(--card-radius); padding: 16px; width: 280px; height: 100%;
+            display: none; flex-direction: column; z-index: 10;
         }
 
         .history-panel.active { display: flex; }
+        .history-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
+        .history-list { overflow-y: auto; flex: 1; }
+        .history-item { font-size: 0.75rem; padding: 6px 0; border-bottom: 1px dashed var(--border-color); }
 
-        .history-title {
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: var(--text-main);
-            margin-bottom: 10px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .setting-toggle {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px; padding: 8px 10px; background: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.8rem;
         }
 
-        .history-list {
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 4px;
+        .option-selector { display: flex; gap: 6px; margin-bottom: 10px; }
+
+        .option-btn {
+            flex: 1; padding: 8px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); color: var(--text-main);
+            border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: bold;
         }
 
-        .history-item {
-            font-size: 0.75rem;
-            color: var(--text-main);
-            padding: 6px 0;
-            border-bottom: 1px dashed var(--border-color);
-        }
+        .option-btn.active { border-color: var(--accent-color); color: var(--accent-color); }
 
-        .preset-editor-list {
-            max-height: 160px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            padding-right: 4px;
-        }
-
-        .preset-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-            align-items: center;
-        }
-
+        .preset-editor-list { max-height: 180px; overflow-y: auto; margin-bottom: 10px; }
+        .preset-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
         .preset-row input[type="text"] { flex: 2; }
         .preset-row input[type="number"] { flex: 1; }
 
-        .btn-danger {
-            background-color: #7f1d1d;
-            color: #fca5a5;
-            border: 1px solid #991b1b;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
+        .btn-action { width: 100%; padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; }
+        .btn-secondary { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-success { background-color: #059669; color: #ffffff; }
+
+        .toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--accent-color); color: #fff; padding: 8px 16px;
+            border-radius: 20px; font-size: 0.8rem; font-weight: bold;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 10000;
         }
 
-        .btn-action {
-            width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 4px;
+        .toast.active { opacity: 1; }
+
+        .credits-footer { position: fixed; bottom: 12px; right: 16px; font-size: 0.75rem; color: var(--text-muted); opacity: 0.7; font-weight: 600; pointer-events: none; z-index: 100; }
+
+        .char-header {
+            display: flex; gap: 12px; align-items: center; margin-bottom: 12px;
+            background: var(--input-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color);
         }
 
-        .btn-secondary {
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
+        .char-avatar-box {
+            width: 75px; height: 75px; border-radius: 50%; overflow: hidden;
+            border: 2px solid var(--accent-color); background: #000; position: relative;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
         }
 
-        .btn-success {
-            background-color: #059669;
-            color: #ffffff;
+        .char-avatar-box img { width: 100%; height: 100%; object-fit: cover; }
+        .char-avatar-placeholder { font-size: 1.8rem; }
+
+        .stat-card {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 6px; text-align: center;
         }
 
-        .setting-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 8px 10px;
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.8rem;
-        }
+        .stat-card label { font-size: 0.65rem; margin-bottom: 2px; }
+        .stat-value { font-size: 1.1rem; font-weight: bold; color: var(--accent-color); }
 
-        .theme-selector {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
+        .spell-slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
 
-        .theme-btn {
-            flex: 1;
-            padding: 8px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        .theme-btn.active {
-            border-color: var(--accent-color);
-            color: var(--accent-color);
-        }
-
-        .credits-footer {
-            position: fixed;
-            bottom: 12px;
-            right: 16px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            opacity: 0.7;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            pointer-events: none;
-            z-index: 100;
+        .spell-slot-item {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            padding: 6px; border-radius: 6px; font-size: 0.75rem; text-align: center;
         }
 
         @media (max-width: 768px) {
-            .history-panel {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                margin-left: 0;
-                width: 90%;
-                max-width: 320px;
-                height: 80vh;
-            }
+            .history-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); margin-left: 0; width: 90%; max-width: 320px; height: 80vh; }
+            .grid-6col { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
 <body>
 
+<div class="crit-flash-overlay" id="critFlash"></div>
+<div class="toast" id="toast">Copiado al portapapeles 📋</div>
+
 <div class="card">
     <div>
         <div class="header">
-            <h1>Lanzador d20 Pro</h1>
-            <div class="subtitle">Herramienta Universal Personalizable</div>
+            <h1>Lanzador & Ficha Pro</h1>
+            <div class="subtitle" id="headerCharSubtitle">Sin Personaje Cargado | Atajos: Teclas 1 a 9</div>
+        </div>
+
+        <div class="anti-cheat-banner" id="antiCheatBanner">
+            ⚠️ ATENCIÓN: Se detectó una inconsistencia o intento de manipulación en los datos guardados. Se ha restaurado la última tirada válida verificada.
         </div>
 
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('rollTab')">🎲 Lanzar Dado</button>
+            <button class="tab-btn" onclick="switchTab('charTab')">🛡️ Ficha Personaje</button>
             <button class="tab-btn" onclick="switchTab('configTab')">⚙️ Configuración</button>
         </div>
     </div>
 
+    <!-- TAB 1: DADOS -->
     <div id="rollTab" class="tab-content active">
         <div>
             <div class="form-group">
-                <label for="presetSelect">Seleccionar Preset:</label>
+                <label for="presetSelect">Seleccionar Acción de Personaje (Teclas 1-9):</label>
                 <select id="presetSelect" onchange="applySelectedPreset()"></select>
             </div>
 
             <div class="form-group">
-                <label for="action">Acción / Habilidad:</label>
-                <input type="text" id="action" placeholder="Ej. Ataque, Sigilo, Atletismo...">
+                <label for="action">Acción / Habilidad / Ataque:</label>
+                <input type="text" id="action" placeholder="Ej. Espada Larga, Sigilo, Salvación...">
             </div>
 
             <div class="form-group">
@@ -745,12 +408,11 @@
 
             <div class="roll-options">
                 <button class="btn-alt" onclick="rollD20('dis')">Desventaja</button>
-                <button class="btn-roll" onclick="rollD20('normal')">Lanzar d20</button>
+                <button class="btn-roll" onclick="rollD20('normal')">Lanzar Dado</button>
                 <button class="btn-alt" onclick="rollD20('adv')">Ventaja</button>
             </div>
 
-            <!-- RESULTADO: Se copia UNICAMENTE al hacer clic manualmente -->
-            <div class="result-box" id="resultBox" onclick="copyResultToClipboard()">
+            <div class="result-box" id="resultBox">
                 <div class="details" id="actionName"></div>
                 
                 <div class="dice-stage">
@@ -767,59 +429,269 @@
                 </div>
 
                 <div class="details" id="breakdown"></div>
-                <div class="copy-toast" id="copyToast">¡Copiado al portapapeles!</div>
+                <button class="btn-copy-action" id="btnCopyResult" onclick="copyResultToClipboard()">📋 Copiar Resultado</button>
             </div>
         </div>
 
         <div class="stats">
             <span>Tiradas: <strong id="totalRollsCount">0</strong> | Promedio: <strong id="avgRoll">0</strong></span>
-            <button class="btn-history-toggle" onclick="toggleHistory()">📜 Historial</button>
+            <button class="btn-small" onclick="toggleHistory()">📜 Historial</button>
         </div>
     </div>
 
+    <!-- TAB 2: FICHA DE PERSONAJE -->
+    <div id="charTab" class="tab-content">
+        <div>
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" onclick="switchSubTab('subCharPerfil')">👤 Perfil</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('subCharStats')">⚔️ Stats</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('subCharEquipo')">🎒 Equipo</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('subCharConjuros')">✨ Conjuros</button>
+            </div>
+
+            <div id="subCharPerfil" class="sub-tab-content active">
+                <div class="char-header">
+                    <div class="char-avatar-box" onclick="document.getElementById('avatarFileInput').click()">
+                        <img id="charAvatarImg" src="" style="display:none;">
+                        <span id="charAvatarPlaceholder" class="char-avatar-placeholder">👤</span>
+                        <input type="file" id="avatarFileInput" accept="image/*" style="display:none" onchange="loadAvatarImage(event)">
+                    </div>
+                    <div style="flex:1;">
+                        <input type="text" id="charName" placeholder="Nombre del Personaje" onchange="saveCharacterData()" style="font-weight:bold; font-size:1rem; margin-bottom:4px;">
+                        <div class="grid-2col">
+                            <input type="text" id="charClass" placeholder="Clase y Nivel" onchange="saveCharacterData()">
+                            <input type="text" id="charRace" placeholder="Raza / Especie" onchange="saveCharacterData()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2col">
+                    <div class="form-group">
+                        <label for="charBackground">Trasfondo:</label>
+                        <input type="text" id="charBackground" placeholder="Ej. Acólito, Criminal..." onchange="saveCharacterData()">
+                    </div>
+                    <div class="form-group">
+                        <label for="charAlignment">Alineamiento:</label>
+                        <input type="text" id="charAlignment" placeholder="Ej. Caótico Bueno" onchange="saveCharacterData()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="charPersonality">Rasgos de Personalidad:</label>
+                    <textarea id="charPersonality" onchange="saveCharacterData()"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="charIdeals">Ideales, Vínculos y Defectos:</label>
+                    <textarea id="charIdeals" onchange="saveCharacterData()"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="charHistory">Historia y Notas:</label>
+                    <textarea id="charHistory" onchange="saveCharacterData()"></textarea>
+                </div>
+            </div>
+
+            <div id="subCharStats" class="sub-tab-content">
+                <div class="grid-3col" style="margin-bottom:10px;">
+                    <div class="stat-card">
+                        <label>PV Actuales / Máx</label>
+                        <div style="display:flex; gap:2px; align-items:center;">
+                            <input type="number" id="hpCurrent" value="20" style="text-align:center; padding:4px;" onchange="saveCharacterData()">
+                            <span>/</span>
+                            <input type="number" id="hpMax" value="20" style="text-align:center; padding:4px;" onchange="saveCharacterData()">
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <label>CA (Armadura)</label>
+                        <input type="number" id="charAC" value="10" style="text-align:center; padding:4px;" onchange="saveCharacterData()">
+                    </div>
+                    <div class="stat-card">
+                        <label>Iniciativa / Vel</label>
+                        <div style="display:flex; gap:2px;">
+                            <input type="number" id="charInitMod" value="0" style="text-align:center; padding:4px;" onchange="saveCharacterData()">
+                            <input type="text" id="charSpeed" value="30ft" style="text-align:center; padding:4px;" onchange="saveCharacterData()">
+                        </div>
+                    </div>
+                </div>
+
+                <label>Atributos Principales y Modificadores:</label>
+                <div class="grid-6col">
+                    <div class="stat-card">
+                        <label>FUE</label>
+                        <input type="number" id="attrFue" value="10" style="text-align:center; padding:2px;" onchange="updateAttrMods(); saveCharacterData();">
+                        <div class="stat-value" id="modFue">+0</div>
+                        <button class="btn-small" style="width:100%; margin-top:2px;" onclick="quickRollStat('Fuerza', 'modFue')">🎲</button>
+                    </div>
+                    <div class="stat-card">
+                        <label>DES</label>
+                        <input type="number" id="attrDes" value="10" style="text-align:center; padding:2px;" onchange="updateAttrMods(); saveCharacterData();">
+                        <div class="stat-value" id="modDes">+0</div>
+                        <button class="btn-small" style="width:100%; margin-top:2px;" onclick="quickRollStat('Destreza', 'modDes')">🎲</button>
+                    </div>
+                    <div class="stat-card">
+                        <label>CON</label>
+                        <input type="number" id="attrCon" value="10" style="text-align:center; padding:2px;" onchange="updateAttrMods(); saveCharacterData();">
+                        <div class="stat-value" id="modCon">+0</div>
+                        <button class="btn-small" style="width:100%; margin-top:2px;" onclick="quickRollStat('Constitución', 'modCon')">🎲</button>
+                    </div>
+                    <div class="stat-card">
+                        <label>INT</label>
+                        <input type="number" id="attrInt" value="10" style="text-align:center; padding:2px;" onchange="updateAttrMods(); saveCharacterData();">
+                        <div class="stat-value" id="modInt">+0</div>
+                        <button class="btn-small" style="width:100%; margin-top:2px;" onclick="quickRollStat('Inteligencia', 'modInt')">🎲</button>
+                    </div>
+                    <div class="stat-card">
+                        <label>SAB</label>
+                        <input type="number" id="attrSab" value="10" style="text-align:center; padding:2px;" onchange="updateAttrMods(); saveCharacterData();">
+                        <div class="stat-value" id="modSab">+0</div>
+                        <button class="btn-small" style="width:100%; margin-top:2px;" onclick="quickRollStat('Sabiduría', 'modSab')">🎲</button>
+                    </div>
+                    <div class="stat-card">
+                        <label>CAR</label>
+                        <input type="number" id="attrCar" value="10" style="text-align:center; padding:2px;" onchange="updateAttrMods(); saveCharacterData();">
+                        <div class="stat-value" id="modCar">+0</div>
+                        <button class="btn-small" style="width:100%; margin-top:2px;" onclick="quickRollStat('Carisma', 'modCar')">🎲</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="subCharEquipo" class="sub-tab-content">
+                <div class="form-group">
+                    <label for="charWeapons">Armas y Ataques Principales:</label>
+                    <textarea id="charWeapons" onchange="saveCharacterData()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="charEquipment">Inventario y Equipo:</label>
+                    <textarea id="charEquipment" onchange="saveCharacterData()"></textarea>
+                </div>
+            </div>
+
+            <div id="subCharConjuros" class="sub-tab-content">
+                <label>Espacios de Conjuro (Slots Libres):</label>
+                <div class="spell-slot-grid">
+                    <div class="spell-slot-item">Nivel 1: <input type="number" id="slot1" value="0" style="width:45px; text-align:center;" onchange="saveCharacterData()"></div>
+                    <div class="spell-slot-item">Nivel 2: <input type="number" id="slot2" value="0" style="width:45px; text-align:center;" onchange="saveCharacterData()"></div>
+                    <div class="spell-slot-item">Nivel 3: <input type="number" id="slot3" value="0" style="width:45px; text-align:center;" onchange="saveCharacterData()"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="charSpells">Lista de Conjuros Preparados:</label>
+                    <textarea id="charSpells" style="min-height:120px;" onchange="saveCharacterData()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-action btn-success" onclick="saveCharacterData(true)" style="margin-top:10px;">💾 Guardar Ficha de Personaje</button>
+    </div>
+
+    <!-- TAB 3: CONFIGURACIÓN -->
     <div id="configTab" class="tab-content">
         <div>
-            <label>Estilo Visual:</label>
-            <div class="theme-selector">
-                <button class="theme-btn active" id="themeBtn1" onclick="setTheme(1)">Violeta</button>
-                <button class="theme-btn" id="themeBtn2" onclick="setTheme(2)">Neón</button>
-                <button class="theme-btn" id="themeBtn3" onclick="setTheme(3)">Rojo Tinto</button>
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" onclick="switchSubTab('subConfigGeneral')">🎨 Ajustes</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('subConfigDice')">🎲 Dados</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('subConfigPresets')">📝 Acciones Rápidas</button>
             </div>
 
-            <div class="setting-toggle">
-                <span>Efecto de sonido al lanzar</span>
-                <input type="checkbox" id="soundToggle" checked style="width: auto;">
+            <div id="subConfigGeneral" class="sub-tab-content active">
+                <div>
+                    <label>Estilo Visual:</label>
+                    <div class="option-selector">
+                        <button class="option-btn active" id="themeBtn1" onclick="setTheme(1)">Violeta</button>
+                        <button class="option-btn" id="themeBtn2" onclick="setTheme(2)">Neón</button>
+                        <button class="option-btn" id="themeBtn3" onclick="setTheme(3)">Rojo Tinto</button>
+                    </div>
+
+                    <label>Efecto de Sonido:</label>
+                    <div class="option-selector">
+                        <button class="option-btn active" id="soundBtn1" onclick="setSoundStyle(1)">Sintetizado</button>
+                        <button class="option-btn" id="soundBtn2" onclick="setSoundStyle(2)">Dado Madera</button>
+                    </div>
+
+                    <div class="setting-toggle">
+                        <span>Volumen de Sonido</span>
+                        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.5" style="width: 100px;" onchange="saveUserSettings()">
+                    </div>
+
+                    <div class="setting-toggle">
+                        <span>Modo Dado Grande Centrado</span>
+                        <input type="checkbox" id="overlayDiceToggle" checked style="width: auto;" onchange="saveUserSettings()">
+                    </div>
+
+                    <div class="setting-toggle">
+                        <span>Activar Tirada Oculta</span>
+                        <input type="checkbox" id="hiddenRollToggle" style="width: auto;" onchange="saveUserSettings()">
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <label>Importar / Exportar Datos:</label>
+                    <button class="btn-action btn-secondary" onclick="exportFullData()">📤 Exportar Personaje y Acciones (JSON)</button>
+                    <button class="btn-action btn-secondary" onclick="document.getElementById('importFileInput').click()">📥 Importar Personaje y Acciones (JSON)</button>
+                    <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importFullData(event)">
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <button class="btn-action btn-secondary" style="color: #f87171;" onclick="clearHistory()">🗑️ Limpiar Historial</button>
+                </div>
             </div>
 
-            <div class="setting-toggle">
-                <span>Modo Dado Grande Centrado (Superpuesto)</span>
-                <input type="checkbox" id="overlayDiceToggle" checked style="width: auto;">
+            <div id="subConfigDice" class="sub-tab-content">
+                <div class="grid-2col">
+                    <div class="form-group">
+                        <label for="diceTypeSelect">Tipo de Dado:</label>
+                        <select id="diceTypeSelect" onchange="saveUserSettings()">
+                            <option value="4">d4</option>
+                            <option value="6">d6</option>
+                            <option value="8">d8</option>
+                            <option value="10">d10</option>
+                            <option value="12">d12</option>
+                            <option value="20" selected>d20</option>
+                            <option value="100">d100</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="diceCountInput">Cantidad:</label>
+                        <input type="number" id="diceCountInput" value="1" min="1" max="10" onchange="saveUserSettings()">
+                    </div>
+                </div>
             </div>
 
-            <label>Editor de Presets:</label>
-            <div class="preset-editor-list" id="presetEditorList"></div>
-        </div>
+            <div id="subConfigPresets" class="sub-tab-content">
+                <label>Editor de Acciones Rápidas (Atajos 1-9):</label>
+                <div class="preset-editor-list" id="presetEditorList"></div>
 
-        <div>
-            <button class="btn-action btn-secondary" onclick="addPresetRow()">+ Añadir Preset</button>
-            <button class="btn-action btn-success" onclick="savePresetsFromEditor()">💾 Guardar Presets</button>
-            <button class="btn-action btn-secondary" onclick="resetDefaultPresets()">🔄 Restablecer Presets a 0</button>
-            <button class="btn-action btn-secondary" style="color: #f87171;" onclick="clearHistory()">🗑️ Limpiar Historial</button>
+                <div>
+                    <button class="btn-action btn-secondary" onclick="addPresetRow()">+ Añadir Acción</button>
+                    <button class="btn-action btn-success" onclick="savePresetsFromEditor()">💾 Guardar Acciones</button>
+                    <button class="btn-action btn-secondary" style="color: #f87171;" onclick="resetPresetsToDefault()">🔄 Restablecer Predeterminados</button>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- PANEL DE HISTORIAL -->
     <div class="history-panel" id="historyPanel">
         <div class="history-title">
             <span>📜 Historial</span>
-            <button class="btn-small" style="padding: 2px 6px;" onclick="toggleHistory()">✕</button>
+            <button class="btn-small" onclick="toggleHistory()">✕</button>
+        </div>
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <select id="historyFilterSelect" onchange="renderHistoryUI()" style="font-size:0.7rem; padding:4px;">
+                <option value="all">Ver Todos</option>
+                <option value="crit20">Solo Críticos (20)</option>
+                <option value="crit1">Solo Fallos (1)</option>
+            </select>
+            <button class="btn-small" onclick="exportHistoryTxt()">📥 TXT</button>
         </div>
         <div class="history-list" id="historyList"></div>
     </div>
 </div>
 
-<!-- DADO GRANDE CENTRADO -->
+<!-- OVERLAY DE DADO D20 -->
 <div class="dice-overlay" id="diceOverlay" onclick="closeOverlayOnBackground(event)">
-    <div class="overlay-card" onclick="copyResultToClipboard()">
+    <div class="overlay-card">
         <div class="overlay-stage">
             <div class="overlay-d20" id="overlayD20">
                 <svg viewBox="0 0 100 100">
@@ -832,13 +704,10 @@
                 <span class="overlay-number" id="overlayTotal">?</span>
             </div>
         </div>
-        <div class="overlay-info">
-            <div class="overlay-title" id="overlayActionName">Tirada Libre</div>
-            <div class="overlay-breakdown" id="overlayBreakdown">---</div>
-            <div class="overlay-actions">
-                <button class="btn-overlay-action" onclick="copyResultToClipboard(); event.stopPropagation();">📋 Copiar Resultado</button>
-                <button class="btn-overlay-action" onclick="closeOverlay(); event.stopPropagation();">✕ Cerrar</button>
-            </div>
+        <div class="overlay-info" style="display: flex; flex-direction: column; align-items: center;">
+            <div class="details" id="overlayActionName" style="color:#ffffff; font-weight:bold; font-size:1.1rem;">Tirada Libre</div>
+            <div class="details" id="overlayBreakdown" style="color:#ffffff; margin-bottom:10px;">---</div>
+            <button class="btn-copy-action" id="btnCopyOverlay" onclick="copyResultToClipboard()" style="background: var(--card-bg);">📋 Copiar Resultado</button>
         </div>
     </div>
 </div>
@@ -846,44 +715,279 @@
 <div class="credits-footer">creado por prox</div>
 
 <script>
+    const SECRET_KEY = "PROX_SECRET_DICE_HASH_KEY_V1";
+    const DB_NAME = "DiceAntiCheatDB";
+    const DB_STORE = "roll_records";
+
     const defaultPresets = [
         { name: "Ataque Principal", mod: 0 },
-        { name: "Ataque Mágico / Conjuro", mod: 0 },
+        { name: "Ataque Mágico", mod: 0 },
         { name: "Iniciativa", mod: 0 },
         { name: "Percepción (SAB)", mod: 0 },
         { name: "Sigilo (DES)", mod: 0 },
         { name: "Atletismo (FUE)", mod: 0 },
         { name: "Investigación (INT)", mod: 0 },
         { name: "Persuasión (CAR)", mod: 0 },
-        { name: "Salvación Fuerza", mod: 0 },
-        { name: "Salvación Destreza", mod: 0 },
-        { name: "Salvación Constitución", mod: 0 },
-        { name: "Salvación Inteligencia", mod: 0 },
-        { name: "Salvación Sabiduría", mod: 0 },
-        { name: "Salvación Carisma", mod: 0 }
+        { name: "Salvación Fuerza", mod: 0 }
     ];
 
     let userPresets = [];
+    let fullHistoryData = [];
     let totalRolls = 0;
+    let publicRollsCount = 0;
     let sumRawRolls = 0;
     let rollTimer = null;
-    let animInterval = null;
     let lastRollFormatted = "";
-
-    // Web Audio API
+    let selectedSoundStyle = 1;
+    let currentThemeStyle = 1;
     let audioCtx = null;
+    let dbInstance = null;
 
+    /* --- MOTOR CRYPTO & SEGURIDAD HMAC (Normalizado) --- */
+    function stringifyNormalizado(obj) {
+        if (typeof obj !== "object" || obj === null) return JSON.stringify(obj);
+        if (Array.isArray(obj)) return "[" + obj.map(stringifyNormalizado).join(",") + "]";
+        const keys = Object.keys(obj).sort();
+        return "{" + keys.map(k => JSON.stringify(k) + ":" + stringifyNormalizado(obj[k])).join(",") + "}";
+    }
+
+    async function generateHMAC(datosObj) {
+        const text = stringifyNormalizado(datosObj);
+        const encoder = new TextEncoder();
+        const keyData = encoder.encode(SECRET_KEY);
+        const messageData = encoder.encode(text);
+
+        const cryptoKey = await crypto.subtle.importKey(
+            'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+        );
+        const signature = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+        return Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function verifyHMAC(datosObj, hash) {
+        if (!hash || !datosObj) return false;
+        const calculated = await generateHMAC(datosObj);
+        return calculated === hash;
+    }
+
+    /* --- BASE DE DATOS INDEXEDDB --- */
+    function initIndexedDB() {
+        return new Promise((resolve) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(DB_STORE)) {
+                    db.createObjectStore(DB_STORE, { keyPath: "id" });
+                }
+            };
+            request.onsuccess = (e) => {
+                dbInstance = e.target.result;
+                resolve(dbInstance);
+            };
+            request.onerror = () => resolve(null);
+        });
+    }
+
+    async function saveToIndexedDB(data) {
+        if (!dbInstance) await initIndexedDB();
+        if (!dbInstance) return;
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction(DB_STORE, "readwrite");
+            const store = tx.objectStore(DB_STORE);
+            store.put({ id: "last_roll", data });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => resolve();
+        });
+    }
+
+    function getFromIndexedDB() {
+        return new Promise(async (resolve) => {
+            if (!dbInstance) await initIndexedDB();
+            if (!dbInstance) return resolve(null);
+            try {
+                const tx = dbInstance.transaction(DB_STORE, "readonly");
+                const store = tx.objectStore(DB_STORE);
+                const req = store.get("last_roll");
+                req.onsuccess = () => resolve(req.result ? req.result.data : null);
+                req.onerror = () => resolve(null);
+            } catch(e) {
+                resolve(null);
+            }
+        });
+    }
+
+    /* --- SISTEMA MULTI-CAPA PERSISTENTE SIN FALSOS POSITIVOS --- */
+    async function saveCurrentRollState(extraProps = {}) {
+        const payload = {
+            lastRollFormatted,
+            totalRolls,
+            publicRollsCount,
+            sumRawRolls,
+            fullHistoryData,
+            boxVisible: document.getElementById('resultBox').classList.contains('visible'),
+            overlayActive: extraProps.overlayActive !== undefined ? extraProps.overlayActive : document.getElementById('diceOverlay').classList.contains('active'),
+            finalTotalText: document.getElementById('finalTotal').textContent,
+            finalTotalClass: document.getElementById('finalTotal').className,
+            overlayTotalText: document.getElementById('overlayTotal').textContent,
+            overlayTotalClass: document.getElementById('overlayTotal').className,
+            actionNameText: document.getElementById('actionName').textContent,
+            breakdownText: document.getElementById('breakdown').textContent,
+            overlayActionText: document.getElementById('overlayActionName').textContent,
+            overlayBreakdownText: document.getElementById('overlayBreakdown').textContent,
+            btnCopyText: document.getElementById('btnCopyResult').textContent,
+            btnCopyOverlayText: document.getElementById('btnCopyOverlay').textContent,
+            ...extraProps
+        };
+
+        const signature = await generateHMAC(payload);
+        const secureContainer = { payload, signature };
+        const serializedContainer = JSON.stringify(secureContainer);
+
+        // Resincronizar las tres capas simultáneamente
+        localStorage.setItem('d20_last_roll_state', serializedContainer);
+        sessionStorage.setItem('d20_last_roll_state', serializedContainer);
+        await saveToIndexedDB(secureContainer);
+    }
+
+    async function loadLastRollState() {
+        let localRaw = localStorage.getItem('d20_last_roll_state');
+        let sessionRaw = sessionStorage.getItem('d20_last_roll_state');
+        let idbContainer = await getFromIndexedDB();
+
+        let localContainer = localRaw ? JSON.parse(localRaw) : null;
+        let sessionContainer = sessionRaw ? JSON.parse(sessionRaw) : null;
+
+        const sources = [idbContainer, localContainer, sessionContainer].filter(s => s !== null);
+
+        // Si ninguna capa contiene datos (estado inicial / limpia completa), no hay trampa
+        if (sources.length === 0) {
+            document.getElementById('antiCheatBanner').style.display = 'none';
+            return;
+        }
+
+        let validPayload = null;
+        let tampered = false;
+
+        // Validar la firma criptográfica en las fuentes presentes
+        for (let container of sources) {
+            if (container && container.payload && container.signature) {
+                const isValid = await verifyHMAC(container.payload, container.signature);
+                if (isValid) {
+                    validPayload = container.payload;
+                    break;
+                } else {
+                    tampered = true;
+                }
+            }
+        }
+
+        if (tampered || !validPayload) {
+            document.getElementById('antiCheatBanner').style.display = 'block';
+            if (!validPayload) return;
+        } else {
+            document.getElementById('antiCheatBanner').style.display = 'none';
+        }
+
+        try {
+            const state = validPayload;
+            lastRollFormatted = state.lastRollFormatted || "";
+            totalRolls = state.totalRolls || 0;
+            publicRollsCount = state.publicRollsCount || 0;
+            sumRawRolls = state.sumRawRolls || 0;
+            fullHistoryData = state.fullHistoryData || [];
+
+            document.getElementById('totalRollsCount').textContent = totalRolls;
+            document.getElementById('avgRoll').textContent = publicRollsCount > 0 ? (sumRawRolls / publicRollsCount).toFixed(1) : '0';
+
+            renderHistoryUI();
+
+            if (state.boxVisible) {
+                document.getElementById('resultBox').classList.add('visible');
+                const finalTotal = document.getElementById('finalTotal');
+                finalTotal.textContent = state.finalTotalText || '0';
+                finalTotal.className = state.finalTotalClass || 'd20-number';
+
+                document.getElementById('actionName').textContent = state.actionNameText || '';
+                document.getElementById('breakdown').textContent = state.breakdownText || '';
+                document.getElementById('btnCopyResult').textContent = state.btnCopyText || '📋 Copiar Resultado';
+            }
+
+            if (state.overlayActive) {
+                document.getElementById('diceOverlay').classList.add('active');
+                const overlayTotal = document.getElementById('overlayTotal');
+                overlayTotal.textContent = state.overlayTotalText || '?';
+                overlayTotal.className = state.overlayTotalClass || 'overlay-number';
+
+                document.getElementById('overlayActionName').textContent = state.overlayActionText || '';
+                document.getElementById('overlayBreakdown').textContent = state.overlayBreakdownText || '';
+                document.getElementById('btnCopyOverlay').textContent = state.btnCopyOverlayText || '📋 Copiar Resultado';
+            }
+
+            // Re-sincronizar capas si faltaba alguna para evitar desajustes futuros
+            const secureContainer = { payload: state, signature: await generateHMAC(state) };
+            const serialized = JSON.stringify(secureContainer);
+            localStorage.setItem('d20_last_roll_state', serialized);
+            sessionStorage.setItem('d20_last_roll_state', serialized);
+            await saveToIndexedDB(secureContainer);
+
+        } catch(e) {}
+    }
+
+    /* --- DEMÁS FUNCIONALIDADES --- */
     function getAudioContext() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
         return audioCtx;
     }
 
-    function setTheme(styleNum) {
+    function setSoundStyle(styleNum, skipSave = false) {
+        selectedSoundStyle = styleNum;
+        document.getElementById('soundBtn1').classList.remove('active');
+        document.getElementById('soundBtn2').classList.remove('active');
+        if (styleNum === 1) document.getElementById('soundBtn1').classList.add('active');
+        if (styleNum === 2) document.getElementById('soundBtn2').classList.add('active');
+        if (!skipSave) saveUserSettings();
+    }
+
+    function playDiceSound() {
+        const volume = parseFloat(document.getElementById('volumeSlider').value);
+        if (volume <= 0) return;
+
+        try {
+            const ctx = getAudioContext();
+            const now = ctx.currentTime;
+
+            if (selectedSoundStyle === 1) {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(140, now);
+                osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+                gain.gain.setValueAtTime(volume * 0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else {
+                [0, 0.05, 0.1, 0.16].forEach((delay) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300 - (delay * 800), now + delay);
+                    gain.gain.setValueAtTime(volume * 0.3, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.04);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.04);
+                });
+            }
+        } catch(e) {}
+    }
+
+    function setTheme(styleNum, skipSave = false) {
+        currentThemeStyle = styleNum;
         document.body.classList.remove('theme-style2', 'theme-style3');
         document.getElementById('themeBtn1').classList.remove('active');
         document.getElementById('themeBtn2').classList.remove('active');
@@ -898,113 +1002,137 @@
         } else {
             document.getElementById('themeBtn1').classList.add('active');
         }
+
+        if (!skipSave) saveUserSettings();
     }
 
-    function getRandomD20() {
-        if (window.crypto && window.crypto.getRandomValues) {
-            const arr = new Uint32Array(1);
-            window.crypto.getRandomValues(arr);
-            return (arr[0] % 20) + 1;
-        }
-        return Math.floor(Math.random() * 20) + 1;
+    function saveUserSettings() {
+        const settings = {
+            theme: currentThemeStyle,
+            soundStyle: selectedSoundStyle,
+            volume: document.getElementById('volumeSlider').value,
+            overlayDice: document.getElementById('overlayDiceToggle').checked,
+            hiddenRoll: document.getElementById('hiddenRollToggle').checked,
+            diceType: document.getElementById('diceTypeSelect').value,
+            diceCount: document.getElementById('diceCountInput').value
+        };
+        localStorage.setItem('d20_pro_settings_v1', JSON.stringify(settings));
     }
 
-    function playDiceSound() {
-        if (!document.getElementById('soundToggle').checked) return;
+    function loadUserSettings() {
+        const saved = localStorage.getItem('d20_pro_settings_v1');
+        if (!saved) return;
+
         try {
-            const ctx = getAudioContext();
-            const now = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(140, now);
-            osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
-            
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-            
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            
-            osc.start(now);
-            osc.stop(now + 0.15);
+            const settings = JSON.parse(saved);
+            if (settings.theme) setTheme(settings.theme, true);
+            if (settings.soundStyle) setSoundStyle(settings.soundStyle, true);
+            if (settings.volume !== undefined) document.getElementById('volumeSlider').value = settings.volume;
+            if (settings.overlayDice !== undefined) document.getElementById('overlayDiceToggle').checked = settings.overlayDice;
+            if (settings.hiddenRoll !== undefined) document.getElementById('hiddenRollToggle').checked = settings.hiddenRoll;
+            if (settings.diceType !== undefined) document.getElementById('diceTypeSelect').value = settings.diceType;
+            if (settings.diceCount !== undefined) document.getElementById('diceCountInput').value = settings.diceCount;
         } catch(e) {}
     }
 
-    function init() {
-        const saved = localStorage.getItem('d20_pro_presets_v3');
-        if (saved) {
-            try { userPresets = JSON.parse(saved); } catch(e) { userPresets = [...defaultPresets]; }
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg || 'Copiado al portapapeles 📋';
+        toast.classList.add('active');
+        setTimeout(() => toast.classList.remove('active'), 2000);
+    }
+
+    function getRandomDie(sides) {
+        if (window.crypto && window.crypto.getRandomValues) {
+            const arr = new Uint32Array(1);
+            window.crypto.getRandomValues(arr);
+            return (arr[0] % sides) + 1;
+        }
+        return Math.floor(Math.random() * sides) + 1;
+    }
+
+    async function init() {
+        await initIndexedDB();
+        const savedPresets = localStorage.getItem('d20_pro_presets_v3');
+        if (savedPresets) {
+            try { userPresets = JSON.parse(savedPresets); } catch(e) { userPresets = JSON.parse(JSON.stringify(defaultPresets)); }
         } else {
-            userPresets = [...defaultPresets];
+            userPresets = JSON.parse(JSON.stringify(defaultPresets));
         }
         renderPresetDropdown();
         renderPresetEditor();
+        loadCharacterData();
+        loadUserSettings();
+        await loadLastRollState();
 
-        // Atajo Tecla Espacio para lanzar
         window.addEventListener('keydown', (e) => {
+            const activeEl = document.activeElement;
+            const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
+            
+            if (isTyping) return;
+
             if (e.code === 'Space' || e.key === ' ') {
-                const activeEl = document.activeElement;
-                const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
-                
-                if (!isTyping) {
-                    e.preventDefault();
-                    rollD20('normal');
+                e.preventDefault();
+                rollD20('normal');
+            } else if (e.key >= '1' && e.key <= '9') {
+                const index = parseInt(e.key) - 1;
+                const select = document.getElementById('presetSelect');
+                if (select.options[index + 1]) {
+                    select.selectedIndex = index + 1;
+                    applySelectedPreset();
                 }
             }
         });
     }
 
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.querySelectorAll('.tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.card > .tab-content').forEach(content => content.classList.remove('active'));
 
         if (tabId === 'rollTab') {
-            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.querySelectorAll('.tabs .tab-btn')[0].classList.add('active');
             document.getElementById('rollTab').classList.add('active');
+        } else if (tabId === 'charTab') {
+            document.querySelectorAll('.tabs .tab-btn')[1].classList.add('active');
+            document.getElementById('charTab').classList.add('active');
         } else {
-            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.querySelectorAll('.tabs .tab-btn')[2].classList.add('active');
             document.getElementById('configTab').classList.add('active');
         }
     }
 
-    function toggleHistory() {
-        const panel = document.getElementById('historyPanel');
-        panel.classList.toggle('active');
+    function switchSubTab(subTabId) {
+        const parent = document.getElementById(subTabId).parentElement;
+        parent.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+        parent.querySelectorAll('.sub-tab-content').forEach(content => content.classList.remove('active'));
+
+        event.target.classList.add('active');
+        document.getElementById(subTabId).classList.add('active');
     }
 
-    function closeOverlay() {
-        document.getElementById('diceOverlay').classList.remove('active');
+    function toggleHistory() { document.getElementById('historyPanel').classList.toggle('active'); }
+    
+    function closeOverlay() { 
+        document.getElementById('diceOverlay').classList.remove('active'); 
+        saveCurrentRollState({ overlayActive: false });
     }
+    
+    function closeOverlayOnBackground(e) { closeOverlay(); }
 
-    function closeOverlayOnBackground(e) {
-        if (e.target.id === 'diceOverlay') {
-            closeOverlay();
-        }
-    }
-
-    // FUNCIÓN DE COPIADO MANUAL AL PORTAPAPELES
     function copyResultToClipboard() {
         if (!lastRollFormatted) return;
-        navigator.clipboard.writeText(lastRollFormatted).then(() => {
-            const toast = document.getElementById('copyToast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 1500);
-        }).catch(err => {
-            console.error('Error al copiar: ', err);
-        });
+        navigator.clipboard.writeText(lastRollFormatted);
+        showToast('Texto de tirada copiado 📋');
     }
 
     function renderPresetDropdown() {
         const select = document.getElementById('presetSelect');
-        select.innerHTML = '<option value="custom|0">-- Tirada Manual / Personalizada --</option>';
-
-        userPresets.forEach((p) => {
+        select.innerHTML = '<option value="custom|0">-- Tirada Manual --</option>';
+        userPresets.forEach((p, idx) => {
             const opt = document.createElement('option');
-            const modSign = p.mod >= 0 ? `+${p.mod}` : `${p.mod}`;
+            const keyShortcut = idx < 9 ? `[Tecla ${idx + 1}] ` : '';
             opt.value = `${p.name}|${p.mod}`;
-            opt.textContent = `${p.name} (${modSign})`;
+            opt.textContent = `${keyShortcut}${p.name} (${p.mod >= 0 ? '+' : ''}${p.mod})`;
             select.appendChild(opt);
         });
     }
@@ -1012,14 +1140,13 @@
     function renderPresetEditor() {
         const container = document.getElementById('presetEditorList');
         container.innerHTML = '';
-
         userPresets.forEach((p, index) => {
             const row = document.createElement('div');
             row.className = 'preset-row';
             row.innerHTML = `
-                <input type="text" class="edit-name" value="${p.name}" placeholder="Nombre">
-                <input type="number" class="edit-mod" value="${p.mod}" placeholder="Mod">
-                <button class="btn-danger" onclick="removePresetRow(${index})">✕</button>
+                <input type="text" class="edit-name" value="${p.name}">
+                <input type="number" class="edit-mod" value="${p.mod}">
+                <button class="btn-small" style="background:#7f1d1d;" onclick="removePresetRow(${index})">✕</button>
             `;
             container.appendChild(row);
         });
@@ -1036,15 +1163,8 @@
         }
     }
 
-    function addPresetRow() {
-        userPresets.push({ name: "Nueva Habilidad", mod: 0 });
-        renderPresetEditor();
-    }
-
-    function removePresetRow(index) {
-        userPresets.splice(index, 1);
-        renderPresetEditor();
-    }
+    function addPresetRow() { userPresets.push({ name: "Nueva Habilidad", mod: 0 }); renderPresetEditor(); }
+    function removePresetRow(index) { userPresets.splice(index, 1); renderPresetEditor(); }
 
     function savePresetsFromEditor() {
         const rows = document.querySelectorAll('.preset-row');
@@ -1057,45 +1177,224 @@
         userPresets = updated;
         localStorage.setItem('d20_pro_presets_v3', JSON.stringify(userPresets));
         renderPresetDropdown();
-        alert('¡Presets guardados exitosamente!');
+        showToast('Acciones guardadas correctamente 💾');
         switchTab('rollTab');
     }
 
-    function resetDefaultPresets() {
-        if (confirm('¿Quieres restablecer todos los presets a los nombres por defecto con modificador 0?')) {
-            userPresets = JSON.parse(JSON.stringify(defaultPresets));
-            localStorage.setItem('d20_pro_presets_v3', JSON.stringify(userPresets));
-            renderPresetDropdown();
-            renderPresetEditor();
-            alert('Presets restablecidos a 0.');
-        }
+    function resetPresetsToDefault() {
+        userPresets = JSON.parse(JSON.stringify(defaultPresets));
+        localStorage.setItem('d20_pro_presets_v3', JSON.stringify(userPresets));
+        renderPresetEditor();
+        renderPresetDropdown();
+        showToast('Acciones restablecidas por defecto 🔄');
     }
 
-    function clearHistory() {
-        document.getElementById('historyList').innerHTML = '';
-        totalRolls = 0;
-        sumRawRolls = 0;
+    function calcMod(val) { return Math.floor((val - 10) / 2); }
+
+    function updateAttrMods() {
+        const attrs = ['Fue', 'Des', 'Con', 'Int', 'Sab', 'Car'];
+        attrs.forEach(attr => {
+            const val = parseInt(document.getElementById('attr' + attr).value) || 10;
+            const mod = calcMod(val);
+            document.getElementById('mod' + attr).textContent = (mod >= 0 ? '+' : '') + mod;
+        });
+    }
+
+    function quickRollStat(statName, modElId) {
+        const modText = document.getElementById(modElId).textContent;
+        const modVal = parseInt(modText) || 0;
+        document.getElementById('action').value = 'Prueba de ' + statName;
+        document.getElementById('modifier').value = modVal;
+        switchTab('rollTab');
+        rollD20('normal');
+    }
+
+    function loadAvatarImage(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const imgEl = document.getElementById('charAvatarImg');
+            imgEl.src = evt.target.result;
+            imgEl.style.display = 'block';
+            document.getElementById('charAvatarPlaceholder').style.display = 'none';
+            saveCharacterData();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function saveCharacterData(showToastMsg = false) {
+        const charData = {
+            name: document.getElementById('charName').value,
+            class: document.getElementById('charClass').value,
+            race: document.getElementById('charRace').value,
+            bg: document.getElementById('charBackground').value,
+            alignment: document.getElementById('charAlignment').value,
+            personality: document.getElementById('charPersonality').value,
+            ideals: document.getElementById('charIdeals').value,
+            history: document.getElementById('charHistory').value,
+            hpCurrent: document.getElementById('hpCurrent').value,
+            hpMax: document.getElementById('hpMax').value,
+            ac: document.getElementById('charAC').value,
+            initMod: document.getElementById('charInitMod').value,
+            speed: document.getElementById('charSpeed').value,
+            attrFue: document.getElementById('attrFue').value,
+            attrDes: document.getElementById('attrDes').value,
+            attrCon: document.getElementById('attrCon').value,
+            attrInt: document.getElementById('attrInt').value,
+            attrSab: document.getElementById('attrSab').value,
+            attrCar: document.getElementById('attrCar').value,
+            weapons: document.getElementById('charWeapons').value,
+            equipment: document.getElementById('charEquipment').value,
+            spells: document.getElementById('charSpells').value,
+            slot1: document.getElementById('slot1').value,
+            slot2: document.getElementById('slot2').value,
+            slot3: document.getElementById('slot3').value,
+            avatar: document.getElementById('charAvatarImg').src
+        };
+
+        localStorage.setItem('d20_char_data', JSON.stringify(charData));
+        const subtitle = charData.name ? `${charData.name} (${charData.class || 'Nivel 1'})` : 'Sin Personaje Cargado';
+        document.getElementById('headerCharSubtitle').textContent = subtitle;
+        if (showToastMsg) showToast('Ficha de Personaje Guardada 💾');
+    }
+
+    function loadCharacterData() {
+        const saved = localStorage.getItem('d20_char_data');
+        if (!saved) { updateAttrMods(); return; }
+
+        try {
+            const data = JSON.parse(saved);
+            document.getElementById('charName').value = data.name || '';
+            document.getElementById('charClass').value = data.class || '';
+            document.getElementById('charRace').value = data.race || '';
+            document.getElementById('charBackground').value = data.bg || '';
+            document.getElementById('charAlignment').value = data.alignment || '';
+            document.getElementById('charPersonality').value = data.personality || '';
+            document.getElementById('charIdeals').value = data.ideals || '';
+            document.getElementById('charHistory').value = data.history || '';
+            document.getElementById('hpCurrent').value = data.hpCurrent || 20;
+            document.getElementById('hpMax').value = data.hpMax || 20;
+            document.getElementById('charAC').value = data.ac || 10;
+            document.getElementById('charInitMod').value = data.initMod || 0;
+            document.getElementById('charSpeed').value = data.speed || '30ft';
+            document.getElementById('attrFue').value = data.attrFue || 10;
+            document.getElementById('attrDes').value = data.attrDes || 10;
+            document.getElementById('attrCon').value = data.attrCon || 10;
+            document.getElementById('attrInt').value = data.attrInt || 10;
+            document.getElementById('attrSab').value = data.attrSab || 10;
+            document.getElementById('attrCar').value = data.attrCar || 10;
+            document.getElementById('charWeapons').value = data.weapons || '';
+            document.getElementById('charEquipment').value = data.equipment || '';
+            document.getElementById('charSpells').value = data.spells || '';
+            document.getElementById('slot1').value = data.slot1 || 0;
+            document.getElementById('slot2').value = data.slot2 || 0;
+            document.getElementById('slot3').value = data.slot3 || 0;
+
+            if (data.avatar && data.avatar.startsWith('data:image')) {
+                const imgEl = document.getElementById('charAvatarImg');
+                imgEl.src = data.avatar;
+                imgEl.style.display = 'block';
+                document.getElementById('charAvatarPlaceholder').style.display = 'none';
+            }
+
+            const subtitle = data.name ? `${data.name} (${data.class || 'Nivel 1'})` : 'Sin Personaje Cargado';
+            document.getElementById('headerCharSubtitle').textContent = subtitle;
+            updateAttrMods();
+        } catch(e) {}
+    }
+
+    function exportFullData() {
+        const charData = JSON.parse(localStorage.getItem('d20_char_data') || '{}');
+        const fullData = { version: '3.2', exportDate: new Date().toISOString(), character: charData, presets: userPresets };
+        const jsonStr = JSON.stringify(fullData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${charData.name || 'personaje'}_ficha_y_acciones.json`;
+        a.click();
+        showToast('Datos exportados exitosamente 📤');
+    }
+
+    function importFullData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (imported.character) {
+                    localStorage.setItem('d20_char_data', JSON.stringify(imported.character));
+                    loadCharacterData();
+                }
+                if (imported.presets && Array.isArray(imported.presets)) {
+                    userPresets = imported.presets;
+                    localStorage.setItem('d20_pro_presets_v3', JSON.stringify(userPresets));
+                    renderPresetDropdown();
+                    renderPresetEditor();
+                }
+                showToast('Ficha e importación completada 📥');
+            } catch (err) { alert('JSON inválido.'); }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    async function clearHistory() {
+        fullHistoryData = []; totalRolls = 0; publicRollsCount = 0; sumRawRolls = 0;
         document.getElementById('totalRollsCount').textContent = '0';
         document.getElementById('avgRoll').textContent = '0';
-        alert('Historial borrado.');
+        localStorage.removeItem('d20_last_roll_state');
+        sessionStorage.removeItem('d20_last_roll_state');
+        if (dbInstance) {
+            const tx = dbInstance.transaction(DB_STORE, "readwrite");
+            tx.objectStore(DB_STORE).clear();
+        }
+        document.getElementById('resultBox').classList.remove('visible');
+        document.getElementById('antiCheatBanner').style.display = 'none';
+        closeOverlay();
+        renderHistoryUI();
+        showToast('Historial borrado 🗑️');
     }
 
-    function addMod(val) {
-        const input = document.getElementById('modifier');
-        input.value = (parseInt(input.value) || 0) + val;
+    function renderHistoryUI() {
+        const filter = document.getElementById('historyFilterSelect').value;
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        const filtered = fullHistoryData.filter(item => {
+            if (filter === 'crit20') return item.isCrit20;
+            if (filter === 'crit1') return item.isCrit1;
+            return true;
+        });
+        filtered.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.textContent = item.displayText;
+            historyList.appendChild(div);
+        });
     }
 
-    function resetMod() {
-        document.getElementById('modifier').value = 0;
+    function exportHistoryTxt() {
+        if (fullHistoryData.length === 0) return;
+        const content = fullHistoryData.map(h => `[${h.timestamp}] ${h.displayText}`).join('\n');
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `historial_dados.txt`;
+        a.click();
     }
+
+    function addMod(val) { document.getElementById('modifier').value = (parseInt(document.getElementById('modifier').value) || 0) + val; }
+    function resetMod() { document.getElementById('modifier').value = 0; }
 
     function rollD20(mode) {
         playDiceSound();
-
         if (rollTimer) clearTimeout(rollTimer);
-        if (animInterval) cancelAnimationFrame(animInterval);
 
         const isOverlayMode = document.getElementById('overlayDiceToggle').checked;
+        const isHiddenRoll = document.getElementById('hiddenRollToggle').checked;
+        const diceSides = parseInt(document.getElementById('diceTypeSelect').value) || 20;
+        const diceCount = Math.min(Math.max(parseInt(document.getElementById('diceCountInput').value) || 1, 1), 10);
 
         const d20Icon = document.getElementById('d20Icon');
         const finalTotalEl = document.getElementById('finalTotal');
@@ -1108,122 +1407,125 @@
         const actionInput = document.getElementById('action').value.trim();
         const modInput = parseInt(document.getElementById('modifier').value) || 0;
 
-        let roll1 = getRandomD20();
-        let roll2 = getRandomD20();
-        let selectedRoll = roll1;
+        let rollsList = [];
+        let rawSum = 0;
         let modeText = '';
+        let isCrit20 = false;
+        let isCrit1 = false;
 
-        if (mode === 'adv') {
-            selectedRoll = Math.max(roll1, roll2);
-            modeText = ` [Ventaja: ${roll1}, ${roll2}]`;
-        } else if (mode === 'dis') {
-            selectedRoll = Math.min(roll1, roll2);
-            modeText = ` [Desventaja: ${roll1}, ${roll2}]`;
+        if (diceCount === 1 && (mode === 'adv' || mode === 'dis')) {
+            let r1 = getRandomDie(diceSides);
+            let r2 = getRandomDie(diceSides);
+            let selected = mode === 'adv' ? Math.max(r1, r2) : Math.min(r1, r2);
+            rollsList.push(selected);
+            rawSum = selected;
+            modeText = ` [${mode === 'adv' ? 'Ventaja' : 'Desventaja'}: ${r1}, ${r2}]`;
+            if (diceSides === 20 && selected === 20) isCrit20 = true;
+            if (diceSides === 20 && selected === 1) isCrit1 = true;
+        } else {
+            for (let i = 0; i < diceCount; i++) {
+                let r = getRandomDie(diceSides);
+                rollsList.push(r);
+                rawSum += r;
+                if (diceSides === 20 && r === 20) isCrit20 = true;
+                if (diceSides === 20 && r === 1) isCrit1 = true;
+            }
         }
 
-        const total = selectedRoll + modInput;
+        const total = rawSum + modInput;
 
         finalTotalEl.className = 'd20-number';
         overlayTotalEl.className = 'overlay-number';
-
-        d20Icon.classList.remove('highlight-normal', 'highlight-crit-20', 'highlight-crit-1');
-        overlayD20.classList.remove('highlight-normal', 'highlight-crit-20', 'highlight-crit-1');
 
         if (isOverlayMode) {
             overlay.classList.add('active');
             overlayD20.classList.remove('spinning');
             void overlayD20.offsetWidth;
             overlayD20.classList.add('spinning');
-
             resultBox.classList.add('visible');
-            d20Icon.classList.remove('spinning');
-
-            overlayTotalEl.textContent = '?';
-            finalTotalEl.textContent = '?';
-
-            let lastUpdate = performance.now();
-            const updateFrame = (now) => {
-                if (now - lastUpdate > 80) {
-                    const randVal = getRandomD20();
-                    overlayTotalEl.textContent = randVal;
-                    finalTotalEl.textContent = randVal;
-                    lastUpdate = now;
-                }
-                animInterval = requestAnimationFrame(updateFrame);
-            };
-            animInterval = requestAnimationFrame(updateFrame);
-
         } else {
             closeOverlay();
             d20Icon.classList.remove('spinning');
             void d20Icon.offsetWidth;
             d20Icon.classList.add('spinning');
             resultBox.classList.add('visible');
-
-            finalTotalEl.textContent = '?';
-
-            let lastUpdate = performance.now();
-            const updateFrame = (now) => {
-                if (now - lastUpdate > 80) {
-                    const randVal = getRandomD20();
-                    finalTotalEl.textContent = randVal;
-                    lastUpdate = now;
-                }
-                animInterval = requestAnimationFrame(updateFrame);
-            };
-            animInterval = requestAnimationFrame(updateFrame);
         }
 
-        rollTimer = setTimeout(() => {
-            if (animInterval) cancelAnimationFrame(animInterval);
-
-            finalTotalEl.textContent = total;
-            overlayTotalEl.textContent = total;
-
+        rollTimer = setTimeout(async () => {
             d20Icon.classList.remove('spinning');
             overlayD20.classList.remove('spinning');
 
-            let critTag = '';
-            if (selectedRoll === 20) {
-                finalTotalEl.classList.add('crit-20');
-                overlayTotalEl.classList.add('crit-20');
-                d20Icon.classList.add('highlight-crit-20');
-                overlayD20.classList.add('highlight-crit-20');
-                critTag = ' ★ ¡CRÍTICO!';
-            } else if (selectedRoll === 1) {
-                finalTotalEl.classList.add('crit-1');
-                overlayTotalEl.classList.add('crit-1');
-                d20Icon.classList.add('highlight-crit-1');
-                overlayD20.classList.add('highlight-crit-1');
-                critTag = ' ✖ ¡FALLO CRÍTICO!';
-            } else {
-                d20Icon.classList.add('highlight-normal');
-                overlayD20.classList.add('highlight-normal');
-            }
-
-            const actionNameText = actionInput ? `Acción: ${actionInput}` : 'Tirada Libre';
-            const modSign = modInput >= 0 ? `+ ${modInput}` : `- ${Math.abs(modInput)}`;
-            const breakdownText = `Dado: ${selectedRoll} (${modSign})${modeText}${critTag}`;
-
-            // Formato guardado internamente (solo se copia si haces clic)
-            lastRollFormatted = `${actionInput ? actionInput + ': ' : ''}Total ${total} (Dado: ${selectedRoll} ${modSign})${modeText}${critTag}`;
-
-            document.getElementById('actionName').textContent = actionNameText;
-            document.getElementById('breakdown').textContent = breakdownText;
-
-            document.getElementById('overlayActionName').textContent = actionNameText;
-            document.getElementById('overlayBreakdown').textContent = breakdownText;
+            lastRollFormatted = `${actionInput ? actionInput + ': ' : ''}Total ${total} (${diceCount}d${diceSides}: ${rollsList.join(',')} ${modInput >= 0 ? '+' : ''}${modInput})${modeText}`;
 
             totalRolls++;
-            sumRawRolls += selectedRoll;
             document.getElementById('totalRollsCount').textContent = totalRolls;
-            document.getElementById('avgRoll').textContent = (sumRawRolls / totalRolls).toFixed(1);
 
-            const historyList = document.getElementById('historyList');
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.textContent = lastRollFormatted;
-            historyList.prepend(historyItem);
+            if (isHiddenRoll) {
+                finalTotalEl.textContent = '🔒';
+                overlayTotalEl.textContent = '🔒';
+                
+                const hiddenTitle = actionInput ? `Acción: ${actionInput}` : 'Tirada Oculta';
+                const hiddenDesc = 'Resultado privado generado (Copiable).';
+
+                document.getElementById('actionName').textContent = hiddenTitle;
+                document.getElementById('breakdown').textContent = hiddenDesc;
+                document.getElementById('overlayActionName').textContent = hiddenTitle;
+                document.getElementById('overlayBreakdown').textContent = hiddenDesc;
+
+                document.getElementById('btnCopyResult').textContent = '📋 Copiar Resultado Privado';
+                document.getElementById('btnCopyOverlay').textContent = '📋 Copiar Resultado Privado';
+
+                fullHistoryData.unshift({ 
+                    timestamp: new Date().toLocaleTimeString(), 
+                    displayText: `${actionInput ? actionInput + ': ' : ''}[Tirada Oculta / Privada]`, 
+                    isCrit20: false, 
+                    isCrit1: false 
+                });
+            } else {
+                finalTotalEl.textContent = total;
+                overlayTotalEl.textContent = total;
+
+                if (isCrit20) {
+                    finalTotalEl.classList.add('crit-20');
+                    overlayTotalEl.classList.add('crit-20');
+                    const flash = document.getElementById('critFlash');
+                    flash.classList.remove('active');
+                    void flash.offsetWidth;
+                    flash.classList.add('active');
+                } else if (isCrit1) {
+                    finalTotalEl.classList.add('crit-1');
+                    overlayTotalEl.classList.add('crit-1');
+                    document.body.classList.remove('shake-fail');
+                    void document.body.offsetWidth;
+                    document.body.classList.add('shake-fail');
+                    setTimeout(() => document.body.classList.remove('shake-fail'), 500);
+                }
+
+                const actionNameText = actionInput ? `Acción: ${actionInput}` : 'Tirada Libre';
+                const breakdownText = `${diceCount}d${diceSides}: [${rollsList.join(', ')}] (${modInput >= 0 ? '+' : ''}${modInput})${modeText}`;
+
+                document.getElementById('actionName').textContent = actionNameText;
+                document.getElementById('breakdown').textContent = breakdownText;
+                document.getElementById('overlayActionName').textContent = actionNameText;
+                document.getElementById('overlayBreakdown').textContent = breakdownText;
+
+                document.getElementById('btnCopyResult').textContent = '📋 Copiar Resultado';
+                document.getElementById('btnCopyOverlay').textContent = '📋 Copiar Resultado';
+
+                publicRollsCount++;
+                sumRawRolls += (rawSum / diceCount);
+                document.getElementById('avgRoll').textContent = (sumRawRolls / publicRollsCount).toFixed(1);
+
+                fullHistoryData.unshift({ 
+                    timestamp: new Date().toLocaleTimeString(), 
+                    displayText: lastRollFormatted, 
+                    isCrit20, 
+                    isCrit1 
+                });
+            }
+
+            renderHistoryUI();
+            await saveCurrentRollState();
 
         }, 800);
     }
